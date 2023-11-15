@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import scipy.special
-import numpy as np
 import itertools
 from math import factorial
 
