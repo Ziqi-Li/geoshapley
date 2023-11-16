@@ -4,7 +4,7 @@
 
 
 # GeoShapley
-A game theory approach to measuring spatial effects from machine learning models. GeoShapley is built on Shapley value and Kernel SHAP estimator.
+A game theory approach to measure spatial effects from machine learning models. GeoShapley is built on Shapley value and Kernel SHAP estimator.
 
 ### Installation:
 
