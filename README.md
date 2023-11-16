@@ -14,23 +14,27 @@ GeoShapley can be installed from PyPI:
 $ pip install geoshapley
 ```
 
+### Example:
 ```python
 from geoshapley import GeoShapleyExplainer
 from sklearn.neural_network import MLPRegressor
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X_geo, y, random_state=1)
 
 #Fit a NN model based on training data
 mlp_model = MLPRegressor().fit(X_train, y_train)
 
 #Specify a small background data
-background_X = X_train.sample(100).values
+background = X_train.sample(100).values
 
 #Initilize a GeoShapleyExplainer
-mlp_explainer = GeoShapleyExplainer(mlp_model.predict, background_X)
+mlp_explainer = GeoShapleyExplainer(mlp_model.predict, background)
 
 #Explain the data
 mlp_rslt = mlp_explainer.explain(X_geo)
 
 #Make a shap-style summary plot
-rslt.summary_plot()
+mlp_rslt.summary_plot()
 ```
 
