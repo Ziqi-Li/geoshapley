@@ -18,7 +18,7 @@ $ pip install geoshapley
 from geoshapley import GeoShapleyExplainer
 
 #Specify a background sample
-background_X = X_coords.sample(100).values
+background_X = X_geo.sample(100).values
 
 explainer = GeoShapleyExplainer(model.predict, background_X)
 
