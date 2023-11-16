@@ -16,14 +16,19 @@ $ pip install geoshapley
 
 ```python
 from geoshapley import GeoShapleyExplainer
+from sklearn.neural_network import MLPRegressor
 
-#Specify a background sample
-background_X = X_geo.sample(100).values
+#Fit a NN model based on training data
+mlp_model = MLPRegressor().fit(X_train, y_train)
 
-explainer = GeoShapleyExplainer(model.predict, background_X)
+#Specify a small background data
+background_X = X_train.sample(100).values
+
+#Initilize a GeoShapleyExplainer
+mlp_explainer = GeoShapleyExplainer(mlp_model.predict, background_X)
 
 #Explain the data
-rslt = explainer.explain(X_geo)
+mlp_rslt = mlp_explainer.explain(X_geo)
 
 #Make a shap-style summary plot
 rslt.summary_plot()
