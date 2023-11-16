@@ -11,17 +11,17 @@ A game theory approach to measure spatial effects from machine learning models. 
 GeoShapley can be installed from PyPI:
 
 ```bash
-$ pip install geoshapley
+pip install geoshapley
 ```
 
 ```bash
-$ from geoshapley import GeoShapleyExplainer
-$
-$ Specify a background sample
-$ background_X = X_coords.sample(100).values
-$ 
-$ explainer = GeoShapleyExplainer(model.predict, background_X)
-$ rslt = explainer.explain(X_geo)
-$ rslt.summary_plot()
+from geoshapley import GeoShapleyExplainer
+
+#Specify a background sample
+background_X = X_coords.sample(100).values
+ 
+explainer = GeoShapleyExplainer(model.predict, background_X)
+rslt = explainer.explain(X_geo)
+rslt.summary_plot()
 ```
 
