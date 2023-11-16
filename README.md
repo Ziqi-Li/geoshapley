@@ -1,6 +1,6 @@
 
-![PyPI](https://img.shields.io/pypi/v/fastgwr)
-![GitHub](https://img.shields.io/github/license/Ziqi-Li/fastgwr)
+![PyPI](https://img.shields.io/pypi/v/geoshapley)
+![GitHub](https://img.shields.io/github/license/Ziqi-Li/geoshapley)
 
 
 # GeoShapley
@@ -19,9 +19,13 @@ from geoshapley import GeoShapleyExplainer
 
 #Specify a background sample
 background_X = X_coords.sample(100).values
- 
+
 explainer = GeoShapleyExplainer(model.predict, background_X)
+
+#Explain the data
 rslt = explainer.explain(X_geo)
+
+#Make a shap-style summary plot
 rslt.summary_plot()
 ```
 
