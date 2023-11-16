@@ -168,9 +168,10 @@ class GeoShapleyResults:
         self.background = explainer.background
 
 
-    def attribute_to_X(self, svc_coef_col = []):
+    def get_svc(self, col = []):
         """
-        Cal
+        Calculate the local coefficient for each feature
+        col: specify the columns to be calculated
         
         """
     
@@ -180,7 +181,7 @@ class GeoShapleyResults:
         params[:,:-1] = self.primary + self.geo_intera
         params[:,-1] = self.base_value + self.geo
     
-        for j in svc_coef_col:
+        for j in col:
             params[:,j] = params[:,j] / (self.X_geo.values-self.background.mean(axis=0))[:,j]
     
         return np.roll(params, 1,axis=1)
