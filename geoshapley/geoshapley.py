@@ -3,20 +3,21 @@ import pandas as pd
 from tqdm import tqdm
 import scipy.special
 import itertools
+import matplotlib.pyplot as plt
 from math import factorial
 
 
 class GeoShapleyExplainer:
-    def __init__(self, predict_f, background_data=None):
+    def __init__(self, predict_f, background=None):
         """
-        Initializes the GeoShapleyExplainer.
+        Initialize the GeoShapleyExplainer.
 
-        :param predict_f: The predict function of the model to be explained.
-        :param background_data: The background data used for the explanation.
+        predict_f: The predict function of the model to be explained.
+        background: The background data used for the explanation.
         """
-        self.predicy_f = predict_f
-        self.background_data = background_data
-        self.n, self.M = background_data.shape
+        self.predict_f = predict_f
+        self.background = background
+        self.n, self.M = background.shape
         
 
     def kernel_geoshap_single(self, x, reference):
@@ -56,10 +57,11 @@ class GeoShapleyExplainer:
                       if j < (M-2):
                           Z[i, M-1+j] = 1
         
-                weights[i] = self.shapley_kernel(M-1, len(s))
+            weights[i] = self.shapley_kernel(M-1, len(s))
     
         y = self.predict_f(V).reshape(-1)
-    
+
+
         #Solve WLS
         ZTw = np.dot(Z.T, np.diag(weights))
     
@@ -72,24 +74,20 @@ class GeoShapleyExplainer:
         """
         Calculate GeoShapley value for a single sample and averaged over the background data
 
-        :param x: current sample
+        x: current sample
         """
     
-        # background_X :background data
-        # x: current sample
-    
-        n,M = self.background_data.shape
+        n,M = self.background.shape
     
         # feature primary +
         # 2*geo_interaction to other features +
         # interaction + 
         # intercept
         phi = np.zeros(M + (M-2))
-        phi = np.zeros(M)
         
         for i in range(n):
-            reference = self.background_data[i,:]
-            phi = phi + self.kernel_geoshap_single(self.predicy_f, x, reference)
+            reference = self.background[i,:]
+            phi = phi + self.kernel_geoshap_single(x, reference)
     
         phi = phi/n
         base_value = phi[-1]
@@ -107,12 +105,15 @@ class GeoShapleyExplainer:
         :return: A GeoShapleyResults object containing the results of the explanation.
 
         """
+        
+        self.X_geo = X_geo
         n,k = X_geo.shape
+
         geoshaps_total = np.zeros((n,(k-1+k-2)))
     
         for i in tqdm(range(n), leave=False):
             x = X_geo.values[i,:]
-            base_value, geoshap_values = self.kernel_geoshap_all(self.predict_f, x)
+            base_value, geoshap_values = self.kernel_geoshap_all(x)
             geoshaps_total[i,:] = geoshap_values
         
         primary = geoshaps_total[:,:(k-2)]
@@ -123,8 +124,7 @@ class GeoShapleyExplainer:
         return GeoShapleyResults(self, base_value, primary, geo, geo_intera)
 
 
-
-    def powerset(iterable):
+    def powerset(self, iterable):
         """
         Calculate possible coliation sets
 
@@ -132,7 +132,7 @@ class GeoShapleyExplainer:
         s = list(iterable)
         return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(len(s)+1))
 
-    def shapley_kernel(M,s):
+    def shapley_kernel(self, M, s):
         """
         Calculate Shapley Kernel
 
@@ -162,12 +162,17 @@ class GeoShapleyResults:
         self.primary = primary
         self.geo = geo
         self.geo_intera = geo_intera
-        self.X_geo = X_geo
-        self.background_data = background_data
         self.explainer = explainer
+        self.predict_f = explainer.predict_f
+        self.X_geo = explainer.X_geo
+        self.background = explainer.background
 
 
-    def attribute_to_X(self, coef_col = []):
+    def attribute_to_X(self, svc_coef_col = []):
+        """
+        Cal
+        
+        """
     
         n,k = self.primary.shape
     
@@ -175,8 +180,8 @@ class GeoShapleyResults:
         params[:,:-1] = self.primary + self.geo_intera
         params[:,-1] = self.base_value + self.geo
     
-        for j in coef_col:
-            params[:,j] = params[:,j] / (self.X_geo.values-self.background_data.mean(axis=0))[:,j]
+        for j in svc_coef_col:
+            params[:,j] = params[:,j] / (self.X_geo.values-self.background.mean(axis=0))[:,j]
     
         return np.roll(params, 1,axis=1)
     
@@ -193,11 +198,10 @@ class GeoShapleyResults:
     
         return params
 
-    def summary_plot(self, inclde_interaction=True):
+    def summary_plot(self, include_interaction=True, dpi=200):
         """
-        Generates a summary of the results.
+        Generate a SHAP-style summary plot of the GeoShapley values.
         
-        :return: A summarized version of the results.
         """
 
         try:
@@ -205,8 +209,26 @@ class GeoShapleyResults:
         except ImportError:
             print("Please install shap package")
             return None
+        
 
-        pass
+        temp = self.X_geo.iloc[:,:-2].copy()
+        temp["GEO"] = 0
+    
+        if include_interaction:
+            total = np.hstack((self.primary,self.geo.reshape(-1,1),self.geo_intera))
+        
+            temp[[name + " x GEO" for name in self.X_geo.columns[:-2]]] = self.X_geo.iloc[:,:-2].copy()
+        else:
+            total = np.hstack((primary,geo.reshape(-1,1)))
+        
+        #total_exp = (10**(total) - 1)*100
+    
+        plt.figure(dpi=dpi)
+        shap.summary_plot(total,temp,show=False)
+    
+        fig, ax = plt.gcf(), plt.gca()
+        ax.set_xlabel("GeoShapley value (impact on model prediction)")
+
 
     def summary_statistics(self):
         """
@@ -225,4 +247,5 @@ class GeoShapleyResults:
         """
         total = np.sum(self.primary,axis=1) + self.geo + np.sum(self.geo_intera,axis=1)
         
-        print("Components add up to total: ",np.allclose(total+self.base_value, self.predict_f(self.X_geo).reshape(-1), atol=atol))
+        print("Components add up to model prediction: ", 
+              np.allclose(total+self.base_value, self.predict_f(self.X_geo).reshape(-1), atol=atol))

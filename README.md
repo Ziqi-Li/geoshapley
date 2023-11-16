@@ -13,3 +13,15 @@ GeoShapley can be installed from PyPI:
 ```bash
 $ pip install geoshapley
 ```
+
+```bash
+$ from geoshapley import GeoShapleyExplainer
+$
+$ Specify a background sample
+$ background_X = X_coords.sample(100).values
+$ 
+$ explainer = GeoShapleyExplainer(model.predict, background_X)
+$ rslt = explainer.explain(X_geo)
+$ rslt.summary_plot()
+```
+
