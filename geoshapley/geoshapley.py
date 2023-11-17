@@ -14,7 +14,7 @@ class GeoShapleyExplainer:
 
         predict_f: The predict function of the model to be explained.
         background: The background data used for the explanation.
-        g: The number of location features in the data (default is 2). For example, data contains a pair of cooridnates g=2.
+        g: The number of location features in the data (default is 2). For example, dataframe contains a pair of cooridnates (lat,long) g=2.
         """
         self.predict_f = predict_f
         self.background = background
@@ -170,7 +170,7 @@ class GeoShapleyResults:
         self.background = explainer.background
 
 
-    def get_svc(self, col = []):
+    def get_svc(self, col):
         """
         Calculate the spatial coefficient for each feature
 
@@ -184,7 +184,7 @@ class GeoShapleyResults:
         params[:,-1] = self.base_value + self.geo
     
         for j in col:
-            params[:,j] = params[:,j] / (self.X_geo.values - self.X_geo.mean(axis=0))[:,j]
+            params[:,j] = params[:,j] / (self.X_geo.values - self.X_geo.values.mean(axis=0))[:,j]
     
         return np.roll(params, 1,axis=1)
     
