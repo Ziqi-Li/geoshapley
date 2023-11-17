@@ -8,15 +8,17 @@ from math import factorial
 
 
 class GeoShapleyExplainer:
-    def __init__(self, predict_f, background=None):
+    def __init__(self, predict_f, background=None, g=2):
         """
         Initialize the GeoShapleyExplainer.
 
         predict_f: The predict function of the model to be explained.
         background: The background data used for the explanation.
+        g: The number of location features in the data (default is 2). For example, data contains a pair of cooridnates g=2.
         """
         self.predict_f = predict_f
         self.background = background
+        self.g = g
         self.n, self.M = background.shape
         
 
@@ -24,8 +26,8 @@ class GeoShapleyExplainer:
         """
         Calculate GeoShapley value for a single sample and a reference point in the background data
 
-        :param x: current sample
-        :param reference: a reference point in the background data
+        x: current sample
+        reference: a reference point in the background data
         """
 
     
@@ -102,8 +104,7 @@ class GeoShapleyExplainer:
         Explain the entire data.
         X_geo: data to be explained
 
-        :return: A GeoShapleyResults object containing the results of the explanation.
-
+        return: A GeoShapleyResults object containing the results of the explanation.
         """
         
         self.X_geo = X_geo
@@ -151,11 +152,11 @@ class GeoShapleyResults:
         """
         Initializes the GeoShapleyResults.
 
-        :param base_value: The base value
-        :param primary: The primary global effects
-        :param geo: The intrinsic location effect
-        :param geo_intera: The interaction effects between location and other features
-        :param X_geo: The data explained
+        base_value: The base value
+        primary: The primary global effects
+        geo: The intrinsic location effect
+        geo_intera: The interaction effects between location and other features
+        X_geo: The data explained
 
         """
         self.base_value = base_value
@@ -165,14 +166,15 @@ class GeoShapleyResults:
         self.explainer = explainer
         self.predict_f = explainer.predict_f
         self.X_geo = explainer.X_geo
+        self.g = explainer.g
         self.background = explainer.background
 
 
     def get_svc(self, col = []):
         """
-        Calculate the local coefficient for each feature
-        col: specify the columns to be calculated
-        
+        Calculate the spatial coefficient for each feature
+
+        col: specify the column index to be calculated
         """
     
         n,k = self.primary.shape
@@ -182,15 +184,17 @@ class GeoShapleyResults:
         params[:,-1] = self.base_value + self.geo
     
         for j in col:
-            params[:,j] = params[:,j] / (self.X_geo.values-self.background.mean(axis=0))[:,j]
+            params[:,j] = params[:,j] / (self.X_geo.values - self.X_geo.mean(axis=0))[:,j]
     
         return np.roll(params, 1,axis=1)
     
 
     def geoshap_to_shap(self):
+        """
+        Convert GeoShapley values to Shapley values
+        This will evenly distribute the interaction effect to each feature and location.
 
-
-
+        """
         n,k = self.primary.shape
         params = np.zeros((n, k))
     
@@ -212,20 +216,17 @@ class GeoShapleyResults:
             return None
         
 
-        temp = self.X_geo.iloc[:,:-2].copy()
-        temp["GEO"] = 0
+        names = self.X_geo.iloc[:,:-2].copy()
+        names["GEO"] = 0
     
         if include_interaction:
             total = np.hstack((self.primary,self.geo.reshape(-1,1),self.geo_intera))
-        
-            temp[[name + " x GEO" for name in self.X_geo.columns[:-2]]] = self.X_geo.iloc[:,:-2].copy()
+            names[[name + " x GEO" for name in self.X_geo.columns[:-self.g]]] = self.X_geo.iloc[:,:-self.g].copy()
         else:
-            total = np.hstack((primary,geo.reshape(-1,1)))
-        
-        #total_exp = (10**(total) - 1)*100
-    
+            total = np.hstack((self.primary,self.geo.reshape(-1,1)))
+            
         plt.figure(dpi=dpi)
-        shap.summary_plot(total,temp,show=False)
+        shap.summary_plot(total, names, show=False)
     
         fig, ax = plt.gcf(), plt.gca()
         ax.set_xlabel("GeoShapley value (impact on model prediction)")
