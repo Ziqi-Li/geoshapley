@@ -220,10 +220,10 @@ class GeoShapleyResults:
         names["GEO"] = 0
     
         if include_interaction:
-            total = np.hstack((self.primary,self.geo.reshape(-1,1),self.geo_intera))
+            total = np.hstack((self.primary, self.geo.reshape(-1,1),self.geo_intera))
             names[[name + " x GEO" for name in self.X_geo.columns[:-self.g]]] = self.X_geo.iloc[:,:-self.g].copy()
         else:
-            total = np.hstack((self.primary,self.geo.reshape(-1,1)))
+            total = np.hstack((self.primary, self.geo.reshape(-1,1)))
             
         plt.figure(dpi=dpi)
         shap.summary_plot(total, names, show=False)
