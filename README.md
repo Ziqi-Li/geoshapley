@@ -15,6 +15,9 @@ $ pip install geoshapley
 ```
 
 ### Example:
+
+Currently, coordinates need to be put as the last two columns of your DataFrame (`X_geo`). Below shows an example on how to explain a trained NN model.
+
 ```python
 from geoshapley import GeoShapleyExplainer
 from sklearn.neural_network import MLPRegressor
