@@ -171,7 +171,7 @@ class GeoShapleyResults:
         self.background = explainer.background
 
 
-    def get_svc(self, col):
+    def get_svc(self, col, include_primary=False):
         """
         Calculate the spatial coefficient for each feature
 
@@ -181,7 +181,10 @@ class GeoShapleyResults:
         n,k = self.primary.shape
     
         params = np.zeros((n, k))
-        params[:,:] = self.geo_intera
+        params[:,:] = self.geo_intera 
+
+        if include_primary:
+            params[:,:] = params[:,:] + self.primary
 
         for j in col:
             params[:,j] = params[:,j] / (self.X_geo.values - self.X_geo.values.mean(axis=0))[:,j]
@@ -233,26 +236,33 @@ class GeoShapleyResults:
 
 
 
-    def plot_partial_dependence(self, max_cols=3, figsize=(15, 10),dpi=200):
+    def plot_partial_dependence(self, max_cols=3, figsize=(12, 12), dpi=200, **kwargs):
+        """
+        Plot partial dependence plots for each feature.
 
+        max_cols: maximum number of columns in the plot
+        figsize: figure size
+        dpi: figure dpi
 
-        num_cols = self.primary.shape[1]
+        """
+
+        k = self.primary.shape[1]
     
-        num_cols = min(num_cols, max_cols)
-        num_rows = math.ceil(num_cols / num_cols)
+        num_cols = min(k, max_cols)
+        num_rows = ceil(k / num_cols)
 
         fig, axs = plt.subplots(num_rows, num_cols, figsize=figsize)
         axs = axs.flatten() if num_rows > 1 else [axs]
 
         col_counter = 0
-        for col in range(num_cols):
+        for col in range(k):
         
             axs[col_counter].axhline(0, linestyle='--',color='black')
             axs[col_counter].scatter(self.X_geo.iloc[:,col], self.primary[:,col],s=10,
-                                 color='#2196F3',edgecolors= "white",lw=0.3)
+                                 color='#2196F3',edgecolors= "white",lw=0.3,**kwargs)
         
             axs[col_counter].set_ylabel("GeoShapley Value")
-            axs[col_counter].set_xlabel(X.iloc[:,col].name)
+            axs[col_counter].set_xlabel(self.X_geo.iloc[:,col].name)
 
             col_counter += 1
 
