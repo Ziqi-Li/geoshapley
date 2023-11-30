@@ -4,7 +4,7 @@ from tqdm import tqdm
 import scipy.special
 import itertools
 import matplotlib.pyplot as plt
-from math import factorial
+from math import factorial,ceil
 
 
 class GeoShapleyExplainer:
@@ -167,6 +167,7 @@ class GeoShapleyResults:
         self.predict_f = explainer.predict_f
         self.X_geo = explainer.X_geo
         self.g = explainer.g
+        self.M = explainer.M
         self.background = explainer.background
 
 
@@ -179,14 +180,13 @@ class GeoShapleyResults:
     
         n,k = self.primary.shape
     
-        params = np.zeros((n, k+1))
-        params[:,:-1] = self.primary + self.geo_intera
-        params[:,-1] = self.base_value + self.geo
-    
+        params = np.zeros((n, k))
+        params[:,:] = self.geo_intera
+
         for j in col:
             params[:,j] = params[:,j] / (self.X_geo.values - self.X_geo.values.mean(axis=0))[:,j]
     
-        return np.roll(params, 1,axis=1)
+        return params[col]
     
 
     def geoshap_to_shap(self):
@@ -196,10 +196,10 @@ class GeoShapleyResults:
 
         """
         n,k = self.primary.shape
-        params = np.zeros((n, k))
+        params = np.zeros((n, k+1))
     
         params[:,:-1] = self.primary + self.geo_intera/2
-        params[:,-1] = self.base_value + self.geo + np.sum(self.geo_intera/2,axis=0)
+        params[:,-1] = self.base_value + self.geo + np.sum(self.geo_intera/2,axis=1)
     
         return params
 
@@ -220,16 +220,47 @@ class GeoShapleyResults:
         names["GEO"] = 0
     
         if include_interaction:
-            total = np.hstack((self.primary, self.geo.reshape(-1,1),self.geo_intera))
+            total = np.hstack((self.primary, self.geo.reshape(-1,1), self.geo_intera))
             names[[name + " x GEO" for name in self.X_geo.columns[:-self.g]]] = self.X_geo.iloc[:,:-self.g].copy()
         else:
-            total = np.hstack((self.primary, self.geo.reshape(-1,1)))
+            total = self.geoshap_to_shap()
             
         plt.figure(dpi=dpi)
         shap.summary_plot(total, names, show=False)
     
         fig, ax = plt.gcf(), plt.gca()
         ax.set_xlabel("GeoShapley value (impact on model prediction)")
+
+
+
+    def plot_partial_dependence(self, max_cols=3, figsize=(15, 10),dpi=200):
+
+
+        num_cols = self.primary.shape[1]
+    
+        num_cols = min(num_cols, max_cols)
+        num_rows = math.ceil(num_cols / num_cols)
+
+        fig, axs = plt.subplots(num_rows, num_cols, figsize=figsize)
+        axs = axs.flatten() if num_rows > 1 else [axs]
+
+        col_counter = 0
+        for col in range(num_cols):
+        
+            axs[col_counter].axhline(0, linestyle='--',color='black')
+            axs[col_counter].scatter(self.X_geo.iloc[:,col], self.primary[:,col],s=10,
+                                 color='#2196F3',edgecolors= "white",lw=0.3)
+        
+            axs[col_counter].set_ylabel("GeoShapley Value")
+            axs[col_counter].set_xlabel(X.iloc[:,col].name)
+
+            col_counter += 1
+
+        for i in range(col_counter, num_rows * num_cols):
+            axs[i].axis('off')
+
+
+        plt.tight_layout()
 
 
     def summary_statistics(self):
