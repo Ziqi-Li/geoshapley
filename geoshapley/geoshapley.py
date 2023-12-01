@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import scipy.special
 import itertools
 import matplotlib.pyplot as plt
@@ -114,11 +114,6 @@ class GeoShapleyExplainer:
 
         geoshaps_total = np.zeros((n,(k-1+k-2)))
     
-        for i in tqdm(range(n), leave=False):
-            x = X_geo.values[i,:]
-            base_value, geoshap_values = self._kernel_geoshap_all(x)
-            geoshaps_total[i,:] = geoshap_values
-        
         # Parallel computation
         results = Parallel(n_jobs=n_jobs)(delayed(self._kernel_geoshap_all)(X_geo.values[i, :]) for i in tqdm(range(n)))
 
@@ -297,11 +292,11 @@ class GeoShapleyResults:
         print(num_cols, num_rows)
 
         fig, axs = plt.subplots(num_rows, num_cols, figsize=figsize)
-        axs = axs.flatten() #if num_rows > 1 else [axs]
+        axs = axs if num_rows > 1 else [axs]
+        axs = axs.flatten()
 
         col_counter = 0
         for col in range(k):
-        
             axs[col_counter].axhline(0, linestyle='--',color='black')
 
             if 's' not in kwargs:
@@ -330,6 +325,7 @@ class GeoShapleyResults:
 
                 axs[col_counter].plot(XX,pdep, color="red",lw=2)
 
+            col_counter += 1
 
         for i in range(col_counter, num_rows * num_cols):
             axs[i].axis('off')
