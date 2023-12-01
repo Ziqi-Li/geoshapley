@@ -22,7 +22,7 @@ class GeoShapleyExplainer:
         self.n, self.M = background.shape
         
 
-    def kernel_geoshap_single(self, x, reference):
+    def _kernel_geoshap_single(self, x, reference):
         """
         Calculate GeoShapley value for a single sample and a reference point in the background data
 
@@ -45,7 +45,7 @@ class GeoShapleyExplainer:
             V[i,:] = reference
 
         #Mark 1 for each combination
-        for i,s in enumerate(self.powerset(range(M-1))):
+        for i,s in enumerate(self._powerset(range(M-1))):
         
             s = list(s)
             Z[i,s] = 1
@@ -59,7 +59,7 @@ class GeoShapleyExplainer:
                       if j < (M-2):
                           Z[i, M-1+j] = 1
         
-            weights[i] = self.shapley_kernel(M-1, len(s))
+            weights[i] = self._shapley_kernel(M-1, len(s))
     
         y = self.predict_f(V).reshape(-1)
 
@@ -72,7 +72,7 @@ class GeoShapleyExplainer:
         return phi
 
 
-    def kernel_geoshap_all(self, x):
+    def _kernel_geoshap_all(self, x):
         """
         Calculate GeoShapley value for a single sample and averaged over the background data
 
@@ -89,7 +89,7 @@ class GeoShapleyExplainer:
         
         for i in range(n):
             reference = self.background[i,:]
-            phi = phi + self.kernel_geoshap_single(x, reference)
+            phi = phi + self._kernel_geoshap_single(x, reference)
     
         phi = phi/n
         base_value = phi[-1]
@@ -101,7 +101,8 @@ class GeoShapleyExplainer:
 
     def explain(self, X_geo):
         """
-        Explain the entire data.
+        Explain the data.
+
         X_geo: data to be explained
 
         return: A GeoShapleyResults object containing the results of the explanation.
@@ -114,7 +115,7 @@ class GeoShapleyExplainer:
     
         for i in tqdm(range(n), leave=False):
             x = X_geo.values[i,:]
-            base_value, geoshap_values = self.kernel_geoshap_all(x)
+            base_value, geoshap_values = self._kernel_geoshap_all(x)
             geoshaps_total[i,:] = geoshap_values
         
         primary = geoshaps_total[:,:(k-2)]
@@ -125,7 +126,7 @@ class GeoShapleyExplainer:
         return GeoShapleyResults(self, base_value, primary, geo, geo_intera)
 
 
-    def powerset(self, iterable):
+    def _powerset(self, iterable):
         """
         Calculate possible coliation sets
 
@@ -133,7 +134,8 @@ class GeoShapleyExplainer:
         s = list(iterable)
         return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(len(s)+1))
 
-    def shapley_kernel(self, M, s):
+
+    def _shapley_kernel(self, M, s):
         """
         Calculate Shapley Kernel
 
@@ -153,10 +155,10 @@ class GeoShapleyResults:
         Initializes the GeoShapleyResults.
 
         base_value: The base value
-        primary: The primary global effects
+        primary: The primary global feature effects
         geo: The intrinsic location effect
         geo_intera: The interaction effects between location and other features
-        X_geo: The data explained
+        X_geo: The data being explained
 
         """
         self.base_value = base_value
@@ -171,14 +173,15 @@ class GeoShapleyResults:
         self.background = explainer.background
 
 
-    def get_svc(self, col, coef_type = "raw", include_primary=False):
+    def get_svc(self, col, coef_type = "gwr", include_primary=False):
         """
         Calculate the spatial coefficient for each feature
 
         col: specify the column index to be calculated
         coef_type: 
-            "raw": raw coefficient based on the ratio
+            "raw": raw coefficient based on the ratio of interaction effect and mean removed feature value
             "gwr": coefficient based on GWR smoothing
+
         include_primary: whether to include the primary effect in the SVC
 
         """
@@ -199,7 +202,7 @@ class GeoShapleyResults:
                 try:
                     import mgwr
                 except ImportError:
-                    print("Please install mgwr package")
+                    print("Please install mgwr package (e.g., pip install mgwr)")
                 
                 coords = list(zip(self.X_geo.values[:,-2], self.X_geo.values[:,-1]))
                 y = params[:,j].reshape(-1,1)
@@ -215,8 +218,8 @@ class GeoShapleyResults:
 
     def geoshap_to_shap(self):
         """
-        Convert GeoShapley values to Shapley values
-        This will evenly distribute the interaction effect to each feature and location.
+        Convert GeoShapley values to Shapley values.
+        This will evenly redistribute the interaction effect evenly to a feature-location pair.
 
         """
         n,k = self.primary.shape
@@ -232,13 +235,16 @@ class GeoShapleyResults:
         """
         Generate a SHAP-style summary plot of the GeoShapley values.
         
+        include_interaction: whether to include the interaction effect in the summary plot
+        dpi: figure dpi
+        kwargs: other arguments passed to shap.summary_plot
+        
         """
 
         try:
             import shap
         except ImportError:
-            print("Please install shap package")
-            return None
+            print("Please install shap package (e.g., pip install shap)")
         
 
         names = self.X_geo.iloc[:,:-2].copy()
@@ -257,10 +263,11 @@ class GeoShapleyResults:
         ax.set_xlabel("GeoShapley value (impact on model prediction)")
 
 
-    def partial_dependence_plots(self, max_cols=3, figsize=(12, 12), dpi=200, **kwargs):
+    def partial_dependence_plots(self, gam_curve=False, max_cols=3, figsize=(12, 12), dpi=200, **kwargs):
         """
         Plot partial dependence plots for each feature.
 
+        gam_curve: whether to plot the smoothed GAM curve
         max_cols: maximum number of columns in the plot
         figsize: figure size
         dpi: figure dpi
@@ -269,6 +276,12 @@ class GeoShapleyResults:
         """
 
         k = self.primary.shape[1]
+
+        if gam_curve:
+            try:
+                import pygam
+            except ImportError:
+                print("Please install pygam package (e.g., pip install pygam)")")
     
         num_cols = min(k, max_cols)
         num_rows = ceil(k / num_cols)
@@ -295,7 +308,17 @@ class GeoShapleyResults:
             axs[col_counter].set_ylabel("GeoShapley Value")
             axs[col_counter].set_xlabel(self.X_geo.iloc[:,col].name)
 
-            col_counter += 1
+
+            if gam_curve:
+                lam = np.arange(40,201,20).reshape(-1,1)
+                gam = pygam.LinearGAM(pygam.s(0),fit_intercept=False).gridsearch(self.X_geo.iloc[:,col], self.primary[:,col], lam=lam)
+    
+                for i, term in enumerate(gam.terms):
+                    XX = gam.generate_X_grid(term=i)
+                    pdep, confi = gam.partial_dependence(term=i, X=XX, width=0.95)
+
+                axs[col_counter].plot(XX,pdep, color="red",lw=2)
+
 
         for i in range(col_counter, num_rows * num_cols):
             axs[i].axis('off')
@@ -306,7 +329,9 @@ class GeoShapleyResults:
 
     def summary_statistics(self,include_interaction=True):
         """
-        Calculates summary statistics for the GeoShapley values.
+        Calculates summary statistics for the GeoShapley values. 
+        The table is ranked based on the mean absolute value of the GeoShapley values.
+
         include_interaction: whether to include the interaction effect in the summary statistics
 
         """
@@ -337,9 +362,8 @@ class GeoShapleyResults:
 
     def check_additivity(self,atol=1e-5):
         """
-        Visualizes the results in an appropriate format, such as maps or graphs.
+        Check if the seperate components of GeoShapley add up to the model prediction.
 
-        :return: Visualization of the Shapley value results.
         """
         total = np.sum(self.primary,axis=1) + self.geo + np.sum(self.geo_intera,axis=1)
         
