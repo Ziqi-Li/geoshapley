@@ -292,7 +292,7 @@ class GeoShapleyResults:
         print(num_cols, num_rows)
 
         fig, axs = plt.subplots(num_rows, num_cols, figsize=figsize)
-        axs = axs if num_rows > 1 else [axs]
+        axs = axs if num_rows > 1 else np.array([axs])
         axs = axs.flatten()
 
         col_counter = 0
