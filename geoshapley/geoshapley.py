@@ -5,6 +5,7 @@ import scipy.special
 import itertools
 import matplotlib.pyplot as plt
 from math import factorial,ceil
+from joblib import Parallel, delayed
 
 
 class GeoShapleyExplainer:
@@ -99,7 +100,7 @@ class GeoShapleyExplainer:
 
 
 
-    def explain(self, X_geo):
+    def explain(self, X_geo, n_jobs=1):
         """
         Explain the data.
 
@@ -118,6 +119,13 @@ class GeoShapleyExplainer:
             base_value, geoshap_values = self._kernel_geoshap_all(x)
             geoshaps_total[i,:] = geoshap_values
         
+        # Parallel computation
+        results = Parallel(n_jobs=n_jobs)(delayed(self._kernel_geoshap_all)(X_geo.values[i, :]) for i in tqdm(range(n)))
+
+        # Extract results
+        geoshaps_total = np.array([result[1] for result in results])
+        base_value = results[0][0]  # Assuming base_value is same for all
+
         primary = geoshaps_total[:,:(k-2)]
         geo = geoshaps_total[:,(k-2)]
         geo_intera = geoshaps_total[:,(k-1):]
@@ -281,13 +289,15 @@ class GeoShapleyResults:
             try:
                 import pygam
             except ImportError:
-                print("Please install pygam package (e.g., pip install pygam)")")
+                print("Please install pygam package (e.g., pip install pygam)")
     
         num_cols = min(k, max_cols)
         num_rows = ceil(k / num_cols)
+        
+        print(num_cols, num_rows)
 
         fig, axs = plt.subplots(num_rows, num_cols, figsize=figsize)
-        axs = axs.flatten() if num_rows > 1 else [axs]
+        axs = axs.flatten() #if num_rows > 1 else [axs]
 
         col_counter = 0
         for col in range(k):
@@ -311,7 +321,8 @@ class GeoShapleyResults:
 
             if gam_curve:
                 lam = np.arange(40,201,20).reshape(-1,1)
-                gam = pygam.LinearGAM(pygam.s(0),fit_intercept=False).gridsearch(self.X_geo.iloc[:,col], self.primary[:,col], lam=lam)
+                gam = pygam.LinearGAM(pygam.s(0),fit_intercept=False).gridsearch(self.X_geo.iloc[:,col].values.reshape(-1,1), 
+                                                                                 self.primary[:,col].reshape(-1,1), lam=lam)
     
                 for i, term in enumerate(gam.terms):
                     XX = gam.generate_X_grid(term=i)
@@ -322,7 +333,6 @@ class GeoShapleyResults:
 
         for i in range(col_counter, num_rows * num_cols):
             axs[i].axis('off')
-
 
         plt.tight_layout()
 
