@@ -171,11 +171,16 @@ class GeoShapleyResults:
         self.background = explainer.background
 
 
-    def get_svc(self, col, include_primary=False):
+    def get_svc(self, col, coef_type = "raw", include_primary=False):
         """
         Calculate the spatial coefficient for each feature
 
         col: specify the column index to be calculated
+        coef_type: 
+            "raw": raw coefficient based on the ratio
+            "gwr": coefficient based on GWR smoothing
+        include_primary: whether to include the primary effect in the SVC
+
         """
     
         n,k = self.primary.shape
@@ -187,9 +192,25 @@ class GeoShapleyResults:
             params[:,:] = params[:,:] + self.primary
 
         for j in col:
-            params[:,j] = params[:,j] / (self.X_geo.values - self.X_geo.values.mean(axis=0))[:,j]
+            if coef_type == "raw":
+                params[:,j] = params[:,j] / (self.X_geo.values - self.X_geo.values.mean(axis=0))[:,j]
+
+            if coef_type == "gwr":
+                try:
+                    import mgwr
+                except ImportError:
+                    print("Please install mgwr package")
+                
+                coords = list(zip(self.X_geo.values[:,-2], self.X_geo.values[:,-1]))
+                y = params[:,j].reshape(-1,1)
+                X = (self.X_geo.values - self.X_geo.values.mean(axis=0))[:,j].reshape(-1,1)
+                gwr_selector = mgwr.sel_bw.Sel_BW(coords, y, X,constant=False)
+                gwr_bw = gwr_selector.search()
+                gwr_model = mgwr.gwr.GWR(coords, y, X, gwr_bw,constant=False).fit()
+                params[:,j] = gwr_model.params[:,0]
+                print(gwr_model.R2)
     
-        return params[col]
+        return params[:,col]
     
 
     def geoshap_to_shap(self):
@@ -206,7 +227,8 @@ class GeoShapleyResults:
     
         return params
 
-    def summary_plot(self, include_interaction=True, dpi=200):
+
+    def summary_plot(self, include_interaction=True, dpi=200, **kwargs):
         """
         Generate a SHAP-style summary plot of the GeoShapley values.
         
@@ -229,20 +251,20 @@ class GeoShapleyResults:
             total = self.geoshap_to_shap()
             
         plt.figure(dpi=dpi)
-        shap.summary_plot(total, names, show=False)
+        shap.summary_plot(total, names, show=False, **kwargs)
     
         fig, ax = plt.gcf(), plt.gca()
         ax.set_xlabel("GeoShapley value (impact on model prediction)")
 
 
-
-    def plot_partial_dependence(self, max_cols=3, figsize=(12, 12), dpi=200, **kwargs):
+    def partial_dependence_plots(self, max_cols=3, figsize=(12, 12), dpi=200, **kwargs):
         """
         Plot partial dependence plots for each feature.
 
         max_cols: maximum number of columns in the plot
         figsize: figure size
         dpi: figure dpi
+        kwargs: other arguments passed to plt.scatter
 
         """
 
@@ -258,8 +280,17 @@ class GeoShapleyResults:
         for col in range(k):
         
             axs[col_counter].axhline(0, linestyle='--',color='black')
-            axs[col_counter].scatter(self.X_geo.iloc[:,col], self.primary[:,col],s=10,
-                                 color='#2196F3',edgecolors= "white",lw=0.3,**kwargs)
+
+            if 's' not in kwargs:
+                kwargs['s'] = 12
+            if 'color' not in kwargs:
+                kwargs['color'] = "#2196F3"
+            if 'edgecolors' not in kwargs:
+                kwargs['edgecolors'] = "white"
+            if 'lw' not in kwargs:
+                kwargs['lw'] = 0.3
+
+            axs[col_counter].scatter(self.X_geo.iloc[:,col], self.primary[:,col],**kwargs)
         
             axs[col_counter].set_ylabel("GeoShapley Value")
             axs[col_counter].set_xlabel(self.X_geo.iloc[:,col].name)
@@ -273,14 +304,36 @@ class GeoShapleyResults:
         plt.tight_layout()
 
 
-    def summary_statistics(self):
+    def summary_statistics(self,include_interaction=True):
         """
         Calculates summary statistics for the GeoShapley values.
+        include_interaction: whether to include the interaction effect in the summary statistics
 
         """
+        cols = ["min","25%","50%","75%","max"]
+        summary_table = pd.DataFrame(np.percentile(self.primary, [0,25,50,75,100],axis=0).T,columns=cols)
+        summary_table.index = self.X_geo.columns[:-2]
+        summary_table["mean"] = np.mean(self.primary,axis=0)
+        summary_table["std"] = np.std(self.primary,axis=0)
+        summary_table["abs. mean"] = np.mean(np.abs(self.primary),axis=0)
 
-        #To-do
-        pass
+        summary_table.loc['GEO'] = np.append(np.percentile(self.geo, [0,25,50,75,100],axis=0).T, 
+                                     [np.mean(self.geo), np.std(self.geo),
+                                      np.mean(np.abs(self.geo))])
+        
+
+        if include_interaction:
+            intera_summary_table = pd.DataFrame(np.percentile(self.geo_intera, [0,25,50,75,100],axis=0).T,columns=cols)
+            intera_summary_table.index = self.X_geo.columns[:-2] + " x GEO"
+            intera_summary_table["mean"] = np.mean(self.geo_intera,axis=0)
+            intera_summary_table["std"] = np.std(self.geo_intera,axis=0)
+            intera_summary_table["abs. mean"] = np.mean(np.abs(self.geo_intera),axis=0) 
+
+            summary_table = pd.concat([summary_table, intera_summary_table], ignore_index=False)
+        
+        summary_table.sort_values(by=['abs. mean'],ascending=False,inplace=True)
+
+        return summary_table
 
     def check_additivity(self,atol=1e-5):
         """
