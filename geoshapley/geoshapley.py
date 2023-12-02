@@ -214,7 +214,7 @@ class GeoShapleyResults:
                 gwr_bw = gwr_selector.search()
                 gwr_model = mgwr.gwr.GWR(coords, y, X, gwr_bw,constant=False).fit()
                 params[:,j] = gwr_model.params[:,0]
-                print(gwr_model.R2)
+                #print(gwr_model.R2)
     
         return params[:,col]
     
@@ -266,7 +266,7 @@ class GeoShapleyResults:
         ax.set_xlabel("GeoShapley value (impact on model prediction)")
 
 
-    def partial_dependence_plots(self, gam_curve=False, max_cols=3, figsize=(12, 12), dpi=200, **kwargs):
+    def partial_dependence_plots(self, gam_curve=False, max_cols=3, figsize=None, dpi=200, **kwargs):
         """
         Plot partial dependence plots for each feature.
 
@@ -288,8 +288,6 @@ class GeoShapleyResults:
     
         num_cols = min(k, max_cols)
         num_rows = ceil(k / num_cols)
-        
-        print(num_cols, num_rows)
 
         fig, axs = plt.subplots(num_rows, num_cols, figsize=figsize)
         axs = axs if num_rows > 1 else np.array([axs])
@@ -315,7 +313,7 @@ class GeoShapleyResults:
 
 
             if gam_curve:
-                lam = np.arange(40,201,20).reshape(-1,1)
+                lam = np.logspace(2, 7, 5).reshape(-1,1)
                 gam = pygam.LinearGAM(pygam.s(0),fit_intercept=False).gridsearch(self.X_geo.iloc[:,col].values.reshape(-1,1), 
                                                                                  self.primary[:,col].reshape(-1,1), lam=lam)
     
