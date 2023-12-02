@@ -5,7 +5,8 @@
 
 # GeoShapley
 
-<img width="612" alt="Picture1" src="https://github.com/Ziqi-Li/geoshapley/assets/5518908/db96e11e-fbec-4192-894d-ec25cb71f5f7">
+![286448163-db96e11e-fbec-4192-894d-ec25cb71f5f7-removebg-preview](https://github.com/Ziqi-Li/geoshapley/assets/5518908/b450b5b3-fd59-41d8-a64c-fb202f492302)
+
 
 
 A game theory approach to measuring spatial effects from machine learning models. GeoShapley is built on Shapley value and Kernel SHAP estimator.
