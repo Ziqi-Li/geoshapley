@@ -5,7 +5,7 @@
 
 # GeoShapley
 
-![286448163-db96e11e-fbec-4192-894d-ec25cb71f5f7-removebg-preview](https://github.com/Ziqi-Li/geoshapley/assets/5518908/b450b5b3-fd59-41d8-a64c-fb202f492302)
+![](https://github.com/Ziqi-Li/geoshapley/assets/5518908/b450b5b3-fd59-41d8-a64c-fb202f492302|width=100)
 
 
 
