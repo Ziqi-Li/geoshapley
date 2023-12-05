@@ -100,11 +100,12 @@ class GeoShapleyExplainer:
 
 
 
-    def explain(self, X_geo, n_jobs=1):
+    def explain(self, X_geo, n_jobs=-1):
         """
         Explain the data.
 
         X_geo: data to be explained
+        n_jobs: number of jobs for parallel computation (default is -1, using all available processors)
 
         return: A GeoShapleyResults object containing the results of the explanation.
         """
