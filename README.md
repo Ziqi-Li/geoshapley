@@ -21,7 +21,9 @@ $ pip install geoshapley
 
 ### Example:
 
-Currently, coordinates need to be put as the last two columns of your DataFrame (`X_geo`). Below shows an example on how to explain a trained NN model.
+GeoShapley can explain any model that takes data + coordiantes as the input. Currently, coordinates need to be put as the last two columns of your `pandas.DataFrame`(`X_geo`). 
+
+Below shows an example on how to explain a trained NN model.
 
 ```python
 from geoshapley import GeoShapleyExplainer
@@ -44,5 +46,11 @@ mlp_rslt = mlp_explainer.explain(X_geo)
 
 #Make a shap-style summary plot
 mlp_rslt.summary_plot()
+
+#Make partial dependence plots of the primary (non-spatial) effects
+mlp_rslt.partial_dependence_plots()
+
+#Calculate spatially varying explanations
+mlp_svc = mlp_rslt.get_svc()
 ```
 
