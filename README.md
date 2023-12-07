@@ -53,4 +53,6 @@ mlp_rslt.partial_dependence_plots()
 #Calculate spatially varying explanations
 mlp_svc = mlp_rslt.get_svc()
 ```
+### Reference:
+Li, Z. (2023a). GeoShapley: A Game Theory Approach to Measuring Spatial Effects in Machine Learning Models. arXiv preprint [https://doi.org/10.48550/arXiv.2312.03675](https://doi.org/10.48550/arXiv.2312.03675)
 
