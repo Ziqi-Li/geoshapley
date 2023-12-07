@@ -3,3 +3,4 @@ pandas
 tqdm
 scipy
 itertools
+joblib
