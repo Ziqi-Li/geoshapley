@@ -2,5 +2,4 @@ numpy
 pandas
 tqdm
 scipy
-itertools
 joblib

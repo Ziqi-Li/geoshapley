@@ -1,1 +1,1 @@
-from . import geoshapley
+from .geoshapley import GeoShapleyExplainer
