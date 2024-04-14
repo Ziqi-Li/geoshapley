@@ -14,8 +14,8 @@ class GeoShapleyExplainer:
         Initialize the GeoShapleyExplainer.
 
         predict_f: The predict function of the model to be explained.
-        background: The background data used for the explanation.
-        g: The number of location features in the data (default is 2). For example, dataframe contains a pair of cooridnates (lat,long) g=2.
+        background: The background data (numpy array) used for the explanation.
+        g: The number of location features in the data (default is 2). For example, feature set contains a pair of cooridnates (lat,long) g=2.
         """
         self.predict_f = predict_f
         self.background = background
@@ -110,7 +110,7 @@ class GeoShapleyExplainer:
         """
         Explain the data.
 
-        X_geo: data to be explained
+        X_geo: pandas dataframe to be explained
         n_jobs: number of jobs for parallel computation (default is -1, using all available processors)
 
         return: A GeoShapleyResults object containing the results of the explanation.
@@ -184,13 +184,14 @@ class GeoShapleyResults:
         self.background = explainer.background
 
 
-    def get_svc(self, col, coef_type = "raw", include_primary=False, coords=None):
+    def get_svc(self, col, coef_type = "gwr", include_primary=False, coords=None):
         """
         Calculate the spatial (location-spefific) coefficient for each feature
 
         col: specify the column index to be calculated
         coef_type: 
             "raw": raw coefficient based on the ratio of interaction effect and mean removed feature value. 
+                   May result in extreme values.
             "gwr": coefficient based on GWR smoothing. Requires mgwr package.
         
         include_primary: whether to include the primary effect in the spatial coefficient
@@ -225,7 +226,6 @@ class GeoShapleyResults:
                 gwr_bw = gwr_selector.search(bw_min=20)
                 gwr_model = mgwr.gwr.GWR(coords, y, X, gwr_bw,constant=False).fit()
                 params[:,j] = gwr_model.params[:,0]
-                #print(gwr_model.R2)
     
         return params[:,col]
     
