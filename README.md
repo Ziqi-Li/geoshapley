@@ -21,9 +21,20 @@ $ pip install geoshapley
 
 ### Example:
 
-GeoShapley can explain any model that takes data + coordiantes as the input. Currently, coordinates need to be put as the last two columns of your `pandas.DataFrame`(`X_geo`). 
+GeoShapley can explain any model that takes tabular data + spatial features (e.g., coordinates) as the input. Examples of natively supported models include:
+1. XGBoost/CatBoost/LightGBM
+2. Random Forest
+3. MLP or other `scikit-learn` modules.
+4. [TabNet](https://github.com/dreamquark-ai/tabnet)
+6. [Explainable Boosting Machine](https://github.com/interpretml/interpret)
+7. Statistical models: OLS/Gaussian Process/GWR
 
-Below shows an example on how to explain a trained NN model.
+Other models can be supported by defining a helper function model.predict() to wrap around their original models' prediction or inference functions.
+
+Currently, spatial features (e.g., coordinates) need to be put as the last columns of your `pandas.DataFrame`(`X_geo`). 
+
+
+Below shows an example on how to explain a trained MLP model. More examples can be found at the notebooks folder.
 
 ```python
 from geoshapley import GeoShapleyExplainer
