@@ -70,7 +70,8 @@ class GeoShapleyExplainer:
         y = self.predict_f(V).reshape(-1)
 
         #Solve WLS
-        ZTw = np.dot(Z.T, np.diag(weights))
+        # ZTw = np.dot(Z.T, np.diag(weights))
+        ZTw = Z.T * weights
     
         phi = np.linalg.solve(np.dot(ZTw, Z), np.dot(ZTw, y))
     
