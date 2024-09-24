@@ -19,6 +19,12 @@ GeoShapley can be installed from PyPI:
 $ pip install geoshapley
 ```
 
+To install the latest version from Github:
+
+```bash
+$ pip install git+https://github.com/ziqi-li/geoshapley.git
+```
+
 ### Example:
 
 GeoShapley can explain any model that takes tabular data + spatial features (e.g., coordinates) as the input. Examples of natively supported models include:
