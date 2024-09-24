@@ -223,10 +223,10 @@ class GeoShapleyResults:
 
                 y = params[:,j].reshape(-1,1)
                 X = (self.X_geo.values - self.X_geo.values.mean(axis=0))[:,j].reshape(-1,1)
-                gwr_selector = mgwr.sel_bw.Sel_BW(coords, y, X,constant=False)
+                gwr_selector = mgwr.sel_bw.Sel_BW(coords, y, X)
                 gwr_bw = gwr_selector.search(bw_min=20)
-                gwr_model = mgwr.gwr.GWR(coords, y, X, gwr_bw,constant=False).fit()
-                params[:,j] = gwr_model.params[:,0]
+                gwr_model = mgwr.gwr.GWR(coords, y, X, gwr_bw).fit()
+                params[:,j] = gwr_model.params[:,1]
     
         return params[:,col]
     
