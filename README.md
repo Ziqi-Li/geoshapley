@@ -11,6 +11,9 @@
 
 A game theory approach to measuring spatial effects from machine learning models. GeoShapley is built on Shapley value and Kernel SHAP estimator.
 
+### Recent Updates
+- 04/2025 - Speed up with vectoraiztion and sparse matrix
+
 ### Installation:
 
 GeoShapley can be installed from PyPI:
