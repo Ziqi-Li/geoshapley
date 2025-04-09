@@ -74,7 +74,7 @@ mlp_svc = mlp_rslt.get_svc()
 
 ### References:
 - Li, Z. (2024). GeoShapley: A Game Theory Approach to Measuring Spatial Effects in Machine Learning Models. Annals of the American Association of Geographers. Open access at: [https://www.tandfonline.com/doi/full/10.1080/24694452.2024.2350982](https://www.tandfonline.com/doi/full/10.1080/24694452.2024.2350982)
-- Li, Z. (2022). Extracting spatial effects from machine learning model using local interpretation method: An example of SHAP and XGBoost. Computers, Environment and Urban Systems, 96, 101845. Open access at: [[https://www.tandfonline.com/doi/full/10.1080/24694452.2024.2350982](https://www.sciencedirect.com/science/article/pii/S0198971522000898)]([https://www.tandfonline.com/doi/full/10.1080/24694452.2024.2350982](https://www.sciencedirect.com/science/article/pii/S0198971522000898))
+- Li, Z. (2022). Extracting spatial effects from machine learning model using local interpretation method: An example of SHAP and XGBoost. Computers, Environment and Urban Systems, 96, 101845. Open access at: [https://www.sciencedirect.com/science/article/pii/S0198971522000898](https://www.sciencedirect.com/science/article/pii/S0198971522000898)
 
 
 ### A list of recent papers that applied GeoShapley:
