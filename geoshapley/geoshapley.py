@@ -6,6 +6,7 @@ import itertools
 import matplotlib.pyplot as plt
 from math import factorial,ceil
 from joblib import Parallel, delayed
+from scipy.sparse import coo_matrix
 
 
 class GeoShapleyExplainer:
@@ -21,6 +22,7 @@ class GeoShapleyExplainer:
         self.background = background
         self.g = g
         self.n, self.M = background.shape
+        self._cache_geoshap = {}
         
 
     def _kernel_geoshap_single(self, x, reference):
@@ -76,6 +78,103 @@ class GeoShapleyExplainer:
         phi = np.linalg.solve(np.dot(ZTw, Z), np.dot(ZTw, y))
     
         return phi
+    
+
+
+    def _kernel_geoshap_single_fast(self, x, reference):
+        """
+        Optimized function using vectorization, sparse matrix operations, and caching.
+        
+        This function computes the GeoShapley value for one sample x, using a cached bit
+        matrix and sparse design matrix (which depend only on self.M and self.g).
+        
+        Parameters
+        ----------
+        x : numpy.ndarray
+            1D array representing the current sample.
+        reference : numpy.ndarray
+            1D array representing the background reference.
+            
+        Returns
+        -------
+        phi : numpy.ndarray
+            The computed Shapley values.
+        """
+        # k is defined on the first group of features over which the powerset is formed.
+        k = self.M - self.g
+        M = self.M
+        n = 2 ** (k + 1)
+        cache_key = (self.M, self.g)
+        
+        # If not cached, compute the bit matrix and the sparse design matrix Z.
+        if cache_key not in self._cache_geoshap:
+            # Each row corresponds to a subset (using bit representation for features 0...k).
+            bits = ((np.arange(n)[:, None] >> np.arange(k + 1)) & 1).astype(bool)
+            
+            # Build sparse design matrix Z with shape (n, 2*k+2)
+            row_idx = []
+            col_idx = []
+            data = []
+            
+            # Block 1: For features 0...k, set entries where bits is True.
+            r, c = np.nonzero(bits)
+            row_idx.append(r)
+            col_idx.append(c)
+            data.append(np.ones_like(r, dtype=int))
+            
+            # Block 2: Interaction terms for features j (< k) when the k-th feature is included.
+            rows_with_k = np.where(bits[:, k])[0]
+            if rows_with_k.size > 0:
+                bits_interact = bits[rows_with_k, :k]
+                r2_local, c2_local = np.nonzero(bits_interact)
+                r2 = rows_with_k[r2_local]
+                c2 = c2_local + (k + 1)  # Shift indices for interaction columns.
+                row_idx.append(r2)
+                col_idx.append(c2)
+                data.append(np.ones_like(r2, dtype=int))
+            
+            # Block 3: Intercept column: last column (index = 2*k+1) is 1 for every row.
+            row_idx.append(np.arange(n))
+            col_idx.append(np.full(n, 2 * k + 1))
+            data.append(np.ones(n, dtype=int))
+            
+            # Combine into a sparse matrix.
+            row_idx = np.concatenate(row_idx)
+            col_idx = np.concatenate(col_idx)
+            data = np.concatenate(data)
+            Z_sparse = coo_matrix((data, (row_idx, col_idx)), shape=(n, 2 * k + 2)).tocsr()
+            
+            # Cache the constructed arrays.
+            self._cache_geoshap[cache_key] = (bits, Z_sparse)
+        else:
+            bits, Z_sparse = self._cache_geoshap[cache_key]
+        
+        # Build the matrix V (n x M) with broadcasting.
+        # Start from the reference and update the positions indicated by bits.
+        V = np.empty((n, M), dtype=reference.dtype)
+        V[:] = reference  # All rows get the reference values.
+        # For the first k+1 features, substitute values from x when the bit is True.
+        V[:, :k+1] = np.where(bits, x[:k+1], reference[:k+1])
+        # For the tail features (columns k+1 to M): if the k-th feature (index k) is True, use values from x.
+        tail_mask = bits[:, k]
+        if tail_mask.any():
+            V[tail_mask, k+1:] = x[k+1:]
+        
+        # --- Compute weights ---
+        # The weight for each row is based on the number of selected features (in bits), with
+        # total features for the kernel set to (k+1). We precompute all possible weights.
+        counts = bits.sum(axis=1)
+        # Precompute kernel values for coalition sizes from 0 to k+1.
+        precomputed_weights = np.array([self._shapley_kernel(k+1, i) for i in range(k + 2)])
+        weights = precomputed_weights[counts]
+        
+        # --- Prediction and Weighted Least Squares ---
+        y = self.predict_f(V).reshape(-1)
+        WZ = Z_sparse.multiply(weights[:, None])
+        A = Z_sparse.transpose().dot(WZ)
+        b = Z_sparse.transpose().dot(weights * y)
+        phi = np.linalg.solve(A.toarray(), b)
+        return phi
 
 
     def _kernel_geoshap_all(self, x):
@@ -97,7 +196,7 @@ class GeoShapleyExplainer:
         
         for i in range(n):
             reference = self.background[i,:]
-            phi = phi + self._kernel_geoshap_single(x, reference)
+            phi = phi + self._kernel_geoshap_single_fast(x, reference)
     
         phi = phi/n
         base_value = phi[-1]
@@ -222,11 +321,12 @@ class GeoShapleyResults:
                     coords = np.array(list(zip(self.X_geo.values[:,-2], self.X_geo.values[:,-1])))
 
                 y = params[:,j].reshape(-1,1)
+                y = y - y.mean()
                 X = (self.X_geo.values - self.X_geo.values.mean(axis=0))[:,j].reshape(-1,1)
-                gwr_selector = mgwr.sel_bw.Sel_BW(coords, y, X)
+                gwr_selector = mgwr.sel_bw.Sel_BW(coords, y, X, constant=False)
                 gwr_bw = gwr_selector.search(bw_min=20)
-                gwr_model = mgwr.gwr.GWR(coords, y, X, gwr_bw).fit()
-                params[:,j] = gwr_model.params[:,1]
+                gwr_model = mgwr.gwr.GWR(coords, y, X, gwr_bw, constant=False).fit()
+                params[:,j] = gwr_model.params[:,0]
     
         return params[:,col]
     
@@ -234,7 +334,7 @@ class GeoShapleyResults:
     def geoshap_to_shap(self):
         """
         Convert GeoShapley values to Shapley values.
-        This will evenly redistribute the interaction effect evenly to a feature-location pair.
+        This will evenly redistribute the interaction effect to a feature-location pair.
 
         """
         n,k = self.primary.shape
@@ -310,7 +410,7 @@ class GeoShapleyResults:
             axs[col_counter].axhline(0, linestyle='--',color='black')
 
             if 's' not in kwargs:
-                kwargs['s'] = 12
+                kwargs['s'] = 30
             if 'color' not in kwargs:
                 kwargs['color'] = "#2196F3"
             if 'edgecolors' not in kwargs:
@@ -325,7 +425,7 @@ class GeoShapleyResults:
 
 
             if gam_curve:
-                lam = np.logspace(2, 7, 5).reshape(-1,1)
+                lam = np.logspace(1, 7, 10).reshape(-1,1)
                 gam = pygam.LinearGAM(pygam.s(0),fit_intercept=False).gridsearch(self.X_geo.iloc[:,col].values.reshape(-1,1), 
                                                                                  self.primary[:,col].reshape(-1,1), lam=lam)
     
@@ -333,7 +433,7 @@ class GeoShapleyResults:
                     XX = gam.generate_X_grid(term=i)
                     pdep, confi = gam.partial_dependence(term=i, X=XX, width=0.95)
 
-                axs[col_counter].plot(XX,pdep, color="red",lw=2)
+                axs[col_counter].plot(XX,pdep, color="red",lw=1)
 
             col_counter += 1
 
