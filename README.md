@@ -12,7 +12,7 @@
 A game theory approach to measuring spatial effects from machine learning models. GeoShapley is built on Shapley value and Kernel SHAP estimator.
 
 ### Recent Updates
-- 04/2025 - Some speed up (2x - 10x) with vectorization and sparse matrix
+- 05/2025 v0.1.0 - Several magnitude of speed-up for more than 10 features by implementing paired sampling from Covert and Lee (2021)
 
 ### Installation:
 
@@ -85,4 +85,5 @@ mlp_svc = mlp_rslt.get_svc()
 - Ke, E., Zhao, J., & Zhao, Y. (2025). Investigating the influence of nonlinear spatial heterogeneity in urban flooding factors using geographic explainable artificial intelligence. Journal of Hydrology, 648, 132398.
 - Foroutan, E., Hu, T., & Li, Z. (2025). Revealing key factors of heat-related illnesses using geospatial explainable AI model: A case study in Texas, USA. Sustainable Cities and Society, 122, 106243.
 - Wu, R., Yu, G., & Cao, Y. (2025). The impact of industrial structural transformation in the Yangtze River economic belt on the trade-offs and synergies between urbanization and carbon balance. Ecological Indicators, 171, 113165.
+- Yang, A., Ai, J., & Arkolakis, C. (2025). A Geospatial Approach to Measuring Economic Activity (No. w33619). National Bureau of Economic Research (NBER).
 
