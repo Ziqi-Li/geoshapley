@@ -70,9 +70,26 @@ mlp_rslt.summary_plot()
 #Make partial dependence plots of the primary (non-spatial) effects
 mlp_rslt.partial_dependence_plots()
 
+#Generate a ranked global feature contribution bar plot of the GeoShapley values.
+mlp_rslt.contribution_bar_plot()
+
 #Calculate spatially varying explanations
 mlp_svc = mlp_rslt.get_svc()
 ```
+
+### Visuals:
+
+#### Shap-style summary plot
+<img src="https://github.com/user-attachments/assets/16fc24dd-7f6f-4892-a728-75a5e96d4820" width=80% height=80%>
+
+#### Partial dependence plots of the primary (non-spatial) effects
+
+<img src="https://github.com/user-attachments/assets/a7e26870-0749-427a-9783-ecf3e47fd09e" width=80% height=80%>
+
+#### Ranked global feature contribution bar plot of the GeoShapley values
+
+<img src="https://github.com/user-attachments/assets/edb3be7f-e143-4992-8be8-c02e8d36c9fc" width=60% height=60%>
+
 
 
 ### References:
