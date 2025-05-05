@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from math import factorial,ceil
 
 class GeoShapleyExplainer:
-    def __init__(self, predict_f, background=None, g=2, exact=False, n_sampled_coalitions=1000):
+    def __init__(self, predict_f, background=None, g=2, exact=False, n_sampled_coalitions=2000):
         """
         Initialize the GeoShapleyExplainer.
 
@@ -102,8 +102,8 @@ class GeoShapleyExplainer:
             if len(coalition) == 2:
                 must_have_indices.append(i)
                 must_have_indices.append(coalition_count - 1 - i)
-        
-        
+
+
         # Determine how many remaining coalitions to sample
         remaining_slots = self.n_coalitions - len(must_have_indices)
         
@@ -114,7 +114,7 @@ class GeoShapleyExplainer:
 
         else:
             # Create sampling pool excluding must-have coalitions
-            sampling_pool = [i for i in range(coalition_count) if i not in must_have_indices]
+            sampling_pool = [i for i in range(coalition_count//2) if i not in must_have_indices]
             
             # Get sampling weights for remaining coalitions
             weights = np.array([self.shapley_kernels[i] for i in sampling_pool])
@@ -129,16 +129,20 @@ class GeoShapleyExplainer:
             sampled_additional = np.random.choice(
                 sampling_pool, 
                 size=min(remaining_slots//2, len(sampling_pool)),
-                replace=True,
+                replace=False,
                 p=weights
             )
+
+            
 
             paired = [coalition_count - 1 - i for i in sampled_additional]
             
             # Combine must-have and sampled coalitions
             self.sampled_indices = list(must_have_indices) + list(sampled_additional) + list(paired)
+
+            print(np.unique(must_have_indices).shape,np.unique(sampled_additional).shape, np.unique(paired).shape, np.unique(self.sampled_indices).shape)
         
-            #print(len(must_have_indices), len(sampled_additional), len(paired))
+            print(len(must_have_indices), len(sampled_additional), len(paired))
         
         # Sort indices for consistent ordering
         self.sampled_indices.sort()
@@ -441,6 +445,36 @@ class GeoShapleyResults:
         ax.set_xlabel("GeoShapley value (impact on model prediction)")
 
 
+    def contribution_bar_plot(self, dpi=150):
+        """
+        Generate a ranked global feature contribution bar plot of the GeoShapley values.
+        This plot shows the mean absolute value of the GeoShapley values for each feature and its 
+        primary and location-specific contributions.
+        dpi: figure dpi
+        
+        """
+        plt.figure(dpi=dpi)
+
+        x = np.array(['Geo'] + list(self.X_geo[:-self.g]))
+
+        y1 = np.insert(np.abs(self.primary).mean(axis=0), 0, 0)
+
+        y2 = np.insert(np.abs(self.geo_intera).mean(axis=0), 0, np.abs(self.geo).mean(axis=0))
+
+        total = y1 + y2
+
+        sort_index = np.argsort(total)
+
+        plt.barh(x[sort_index], y1[sort_index], color='#1E88E5')
+        plt.barh(x[sort_index], y2[sort_index], left=y1[sort_index], color='#FF0051')
+
+        plt.xlabel("mean(|GeoShapley|)",fontsize=12)
+        plt.ylabel("Features",fontsize=12)
+        plt.legend(["Non-Geo","Geo"],fontsize=12)
+        plt.title("Global Feature Contribution Rank")
+        plt.tight_layout()
+
+
     def partial_dependence_plots(self, gam_curve=False, max_cols=3, figsize=None, dpi=200, **kwargs):
         """
         Plot partial dependence plots for each feature.
@@ -464,7 +498,7 @@ class GeoShapleyResults:
         num_cols = min(k, max_cols)
         num_rows = ceil(k / num_cols)
 
-        fig, axs = plt.subplots(num_rows, num_cols, figsize=figsize)
+        fig, axs = plt.subplots(num_rows, num_cols, figsize=figsize, dpi=dpi)
         axs = axs if num_rows > 1 else np.array([axs])
         axs = axs.flatten()
 
