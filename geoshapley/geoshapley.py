@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from math import factorial,ceil
 
 class GeoShapleyExplainer:
-    def __init__(self, predict_f, background=None, g=2, exact=False, n_sampled_coalitions=400):
+    def __init__(self, predict_f, background=None, g=2, exact=False, n_sampled_coalitions=1000):
         """
         Initialize the GeoShapleyExplainer.
 
