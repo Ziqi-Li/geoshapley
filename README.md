@@ -101,7 +101,9 @@ mlp_svc = mlp_rslt.get_svc()
 - Peng, Z., Ji, H., Yuan, R., Wang, Y., Easa, S. M., Wang, C., ... & Zhao, X. (2025). Modeling and spatial analysis of heavy-duty truck CO2 using travel activities. Journal of Transport Geography, 124, 104158.
 - Ke, E., Zhao, J., & Zhao, Y. (2025). Investigating the influence of nonlinear spatial heterogeneity in urban flooding factors using geographic explainable artificial intelligence. Journal of Hydrology, 648, 132398.
 - Foroutan, E., Hu, T., & Li, Z. (2025). Revealing key factors of heat-related illnesses using geospatial explainable AI model: A case study in Texas, USA. Sustainable Cities and Society, 122, 106243.
+- Chen, Y., Jiao, S., Gu, X., & Li, S. (2025). Decoding the Spatiotemporal Effects of Industrial Clusters on Carbon Emissions in a Chinese River Basin. Journal of Cleaner Production, 145851.
 - Wu, R., Yu, G., & Cao, Y. (2025). The impact of industrial structural transformation in the Yangtze River economic belt on the trade-offs and synergies between urbanization and carbon balance. Ecological Indicators, 171, 113165.
-- Yang, A., Ai, J., & Arkolakis, C. (2025). A Geospatial Approach to Measuring Economic Activity (No. w33619). National Bureau of Economic Research (NBER).
 - Chen, Y., Ye, Y., Liu, X., Yin, C., & Jones, C. A. (2025). Examining the Nonlinear and Spatial Heterogeneity of Housing Prices in Urban Beijing: An Application of GeoShapley. Habitat International.
+- Yang, A., Ai, J., & Arkolakis, C. (2025). A Geospatial Approach to Measuring Economic Activity (No. w33619). National Bureau of Economic Research (NBER).
+
 
