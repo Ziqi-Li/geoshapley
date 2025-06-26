@@ -1,7 +1,6 @@
 
 ![PyPI](https://img.shields.io/pypi/v/geoshapley)
-![GitHub](https://img.shields.io/github/license/Ziqi-Li/geoshapley)
-
+![Pepy-Downloads](https://static.pepy.tech/badge/geoshapley)
 
 # GeoShapley
 
