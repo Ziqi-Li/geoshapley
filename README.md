@@ -105,5 +105,7 @@ mlp_svc = mlp_rslt.get_svc()
 - Wu, R., Yu, G., & Cao, Y. (2025). The impact of industrial structural transformation in the Yangtze River economic belt on the trade-offs and synergies between urbanization and carbon balance. Ecological Indicators, 171, 113165.
 - Chen, Y., Ye, Y., Liu, X., Yin, C., & Jones, C. A. (2025). Examining the Nonlinear and Spatial Heterogeneity of Housing Prices in Urban Beijing: An Application of GeoShapley. Habitat International.
 - Yang, A., Ai, J., & Arkolakis, C. (2025). A Geospatial Approach to Measuring Economic Activity (No. w33619). National Bureau of Economic Research (NBER).
+- Guo, K., Tang, R., Pan, H., Zhang, D., Liu, Y., & Shi, Z. (2025). Activity Spaces in Multimodal Transportation Networks: A Nonlinear and Spatial Analysis Perspective. ISPRS International Journal of Geo-Information, 14(8), 281.
+- Neto, J. B. P., Santos, N. F., & Orrico Filho, R. D. (2025). Paths to prosperity: How transport networks and income accessibility shape retail location. Journal of Transport Geography, 128, 104377.
 
 
