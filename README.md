@@ -107,5 +107,7 @@ mlp_svc = mlp_rslt.get_svc()
 - Yang, A., Ai, J., & Arkolakis, C. (2025). A Geospatial Approach to Measuring Economic Activity (No. w33619). National Bureau of Economic Research (NBER).
 - Guo, K., Tang, R., Pan, H., Zhang, D., Liu, Y., & Shi, Z. (2025). Activity Spaces in Multimodal Transportation Networks: A Nonlinear and Spatial Analysis Perspective. ISPRS International Journal of Geo-Information, 14(8), 281.
 - Neto, J. B. P., Santos, N. F., & Orrico Filho, R. D. (2025). Paths to prosperity: How transport networks and income accessibility shape retail location. Journal of Transport Geography, 128, 104377.
+- Nguyen, G. V., Van, C. P., Tran, V. N., Van, L. N., & Lee, G. (2025). Toward real-time high-resolution fluvial flood forecasting: A robust surrogate approach based on overland flow models. Environmental Modelling & Software, 106716.
+- Chen, S., Qiu, Y., Xu, Y., Huang, J., & Ding, Z. (2025). Modeling and optimization of heat island networks based on machine learning and the perspective of spatial heterogeneity in metropolitan areas. Urban Climate, 63, 102592.
 
 
