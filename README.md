@@ -109,5 +109,7 @@ mlp_svc = mlp_rslt.get_svc()
 - Neto, J. B. P., Santos, N. F., & Orrico Filho, R. D. (2025). Paths to prosperity: How transport networks and income accessibility shape retail location. Journal of Transport Geography, 128, 104377.
 - Nguyen, G. V., Van, C. P., Tran, V. N., Van, L. N., & Lee, G. (2025). Toward real-time high-resolution fluvial flood forecasting: A robust surrogate approach based on overland flow models. Environmental Modelling & Software, 106716.
 - Chen, S., Qiu, Y., Xu, Y., Huang, J., & Ding, Z. (2025). Modeling and optimization of heat island networks based on machine learning and the perspective of spatial heterogeneity in metropolitan areas. Urban Climate, 63, 102592.
+- Yang, J. T., Zhou, X. W., Chen, X., Yao, X., Li, M., Yin, M. H., ... & Zhao, J. L. (2025). Exploring the Main and Interactive Effects of Urban Morphology on Land Surface Temperature across Different Functional Zones: A Local GeoShapley Analysis Based on XAI. Sustainable Cities and Society, 106913.
+- Yan, H., Wu, H., Su, X., Chu, J., & Askari, K. (2025). A new weighted framework for regional drought risk assessment and geographic explainable insights based on GeoShapley. Journal of Hydrology, 134460.
 
 
