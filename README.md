@@ -98,6 +98,10 @@ mlp_svc = mlp_rslt.get_svc()
 
 
 ### A list of recent papers that applied GeoShapley:
+
+<details>
+  <summary>Click to expand the list</summary>
+
 - Peng, Z., Ji, H., Yuan, R., Wang, Y., Easa, S. M., Wang, C., ... & Zhao, X. (2025). Modeling and spatial analysis of heavy-duty truck CO2 using travel activities. Journal of Transport Geography, 124, 104158.
 - Ke, E., Zhao, J., & Zhao, Y. (2025). Investigating the influence of nonlinear spatial heterogeneity in urban flooding factors using geographic explainable artificial intelligence. Journal of Hydrology, 648, 132398.
 - Foroutan, E., Hu, T., & Li, Z. (2025). Revealing key factors of heat-related illnesses using geospatial explainable AI model: A case study in Texas, USA. Sustainable Cities and Society, 122, 106243.
@@ -113,4 +117,4 @@ mlp_svc = mlp_rslt.get_svc()
 - Yan, H., Wu, H., Su, X., Chu, J., & Askari, K. (2025). A new weighted framework for regional drought risk assessment and geographic explainable insights based on GeoShapley. Journal of Hydrology, 134460.
 - Lyu, F., Chen, K., Olhnuud, A., Sun, X., & Gong, C. (2025). Understanding the Relationship Between Urban Green Infrastructure and PM2. 5 Based on an Explainable Machine Learning Model: Evidence From 288 Cities in China. Earth's Future, 13(11), e2025EF006861.
 
-
+</details>
