@@ -116,5 +116,6 @@ mlp_svc = mlp_rslt.get_svc()
 - Yang, J. T., Zhou, X. W., Chen, X., Yao, X., Li, M., Yin, M. H., ... & Zhao, J. L. (2025). Exploring the Main and Interactive Effects of Urban Morphology on Land Surface Temperature across Different Functional Zones: A Local GeoShapley Analysis Based on XAI. Sustainable Cities and Society, 106913.
 - Yan, H., Wu, H., Su, X., Chu, J., & Askari, K. (2025). A new weighted framework for regional drought risk assessment and geographic explainable insights based on GeoShapley. Journal of Hydrology, 134460.
 - Lyu, F., Chen, K., Olhnuud, A., Sun, X., & Gong, C. (2025). Understanding the Relationship Between Urban Green Infrastructure and PM2. 5 Based on an Explainable Machine Learning Model: Evidence From 288 Cities in China. Earth's Future, 13(11), e2025EF006861.
+- Xiao, L., Wu, M., Weng, Q., & Liu, J. (2025). Exploring nonlinear and spatially varying relationships between built environment and the resilience of urban economic vibrancy under COVID-19. Applied Geography, 185, 103794.
 
 </details>
