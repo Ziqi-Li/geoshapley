@@ -118,6 +118,8 @@ mlp_svc = mlp_rslt.get_svc()
 - Lyu, F., Chen, K., Olhnuud, A., Sun, X., & Gong, C. (2025). Understanding the Relationship Between Urban Green Infrastructure and PM2. 5 Based on an Explainable Machine Learning Model: Evidence From 288 Cities in China. Earth's Future, 13(11), e2025EF006861.
 - Xiao, L., Wu, M., Weng, Q., & Liu, J. (2025). Exploring nonlinear and spatially varying relationships between built environment and the resilience of urban economic vibrancy under COVID-19. Applied Geography, 185, 103794.
 - Pan, Q., Gao, S., Lin, S., & Liu, C. (2025). Exploring Spatio-Temporal Heterogeneity in Sustainable Development Drivers Using Explainable AI: Evidence from China. Finance Research Letters, 109018.
+- Tan, G., Xing, Z., & Meng, F. (2025). Assessing and mapping the seasonal supply of recreational ecosystem services based on thermal comfort in Chongqing, China. Urban Climate, 64, 102661.
+- He, Z., Chen, Y., Ning, Q., Lu, B., Xie, S., & Tang, S. (2025). Unraveling Nonlinear and Spatially Heterogeneous Impacts of Urban Pluvial Flooding Factors in a Hill-Basin City Using Geographically Explainable Artificial Intelligence: A Case Study of Changsha. Sustainability, 17(21), 9866.
 - Bashar, T. J., Tao, R., Fernandes, C., & Jiao, Z. (2026). Evaluating spatial disparities in public EV charging infrastructure across the United States. Journal of Transport Geography, 130, 104507.
 
 </details>
