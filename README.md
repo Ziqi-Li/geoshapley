@@ -121,5 +121,6 @@ mlp_svc = mlp_rslt.get_svc()
 - Tan, G., Xing, Z., & Meng, F. (2025). Assessing and mapping the seasonal supply of recreational ecosystem services based on thermal comfort in Chongqing, China. Urban Climate, 64, 102661.
 - He, Z., Chen, Y., Ning, Q., Lu, B., Xie, S., & Tang, S. (2025). Unraveling Nonlinear and Spatially Heterogeneous Impacts of Urban Pluvial Flooding Factors in a Hill-Basin City Using Geographically Explainable Artificial Intelligence: A Case Study of Changsha. Sustainability, 17(21), 9866.
 - Bashar, T. J., Tao, R., Fernandes, C., & Jiao, Z. (2026). Evaluating spatial disparities in public EV charging infrastructure across the United States. Journal of Transport Geography, 130, 104507.
+- Rui, J., & Gong, W. (2026). Paying lip service? An investigation into the spatial mismatch between younger and older adults' streetscape perceptual preference and visitation behavior. Cities, 171, 106750.
 
 </details>
