@@ -97,7 +97,7 @@ mlp_svc = mlp_rslt.get_svc()
 - Li, Z. (2022). Extracting spatial effects from machine learning model using local interpretation method: An example of SHAP and XGBoost. Computers, Environment and Urban Systems, 96, 101845. Open access at: [https://www.sciencedirect.com/science/article/pii/S0198971522000898](https://www.sciencedirect.com/science/article/pii/S0198971522000898)
 
 
-### A list of recent papers that applied GeoShapley:
+### Some recent papers that applied GeoShapley:
 
 <details>
   <summary>Click to expand the list</summary>
@@ -119,8 +119,10 @@ mlp_svc = mlp_rslt.get_svc()
 - Xiao, L., Wu, M., Weng, Q., & Liu, J. (2025). Exploring nonlinear and spatially varying relationships between built environment and the resilience of urban economic vibrancy under COVID-19. Applied Geography, 185, 103794.
 - Pan, Q., Gao, S., Lin, S., & Liu, C. (2025). Exploring Spatio-Temporal Heterogeneity in Sustainable Development Drivers Using Explainable AI: Evidence from China. Finance Research Letters, 109018.
 - Tan, G., Xing, Z., & Meng, F. (2025). Assessing and mapping the seasonal supply of recreational ecosystem services based on thermal comfort in Chongqing, China. Urban Climate, 64, 102661.
+- Yang, F., Liu, M., Liu, S., Li, F., Liu, W., & Xu, C. (2025). Cross-media dynamics and prioritized risks of PFAS in textile-impacted environments: using geospatial machine learning. Environment International, 110008.
 - He, Z., Chen, Y., Ning, Q., Lu, B., Xie, S., & Tang, S. (2025). Unraveling Nonlinear and Spatially Heterogeneous Impacts of Urban Pluvial Flooding Factors in a Hill-Basin City Using Geographically Explainable Artificial Intelligence: A Case Study of Changsha. Sustainability, 17(21), 9866.
 - Bashar, T. J., Tao, R., Fernandes, C., & Jiao, Z. (2026). Evaluating spatial disparities in public EV charging infrastructure across the United States. Journal of Transport Geography, 130, 104507.
 - Rui, J., & Gong, W. (2026). Paying lip service? An investigation into the spatial mismatch between younger and older adults' streetscape perceptual preference and visitation behavior. Cities, 171, 106750.
+- Tang, Z., Rao, Y., & Fu, M. (2026). Synergistic Dynamics of the Thermal-Energy-Carbon Nexus in the Yangtze River Delta: Spatiotemporal Measurement, Mechanisms, and Spatial Econometric Analysis. Sustainable Cities and Society, 107125.
 
 </details>
