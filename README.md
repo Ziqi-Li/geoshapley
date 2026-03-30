@@ -99,6 +99,8 @@ mlp_svc = mlp_rslt.get_svc()
 
 ### Some recent papers that applied GeoShapley:
 
+To date, GeoShapley has enabled more than 70 peer-reviewed empirical studies in geospatial explainable AI (XAI). These have been published in leading journals such as Journal of Transport Geography, Cities, Applied Geography, Landscape and Urban Planning, Sustainable Cities and Society, Journal of Hydrology, Water Research, Ecological Indicators, Energy, Environmental Impact Assessment Review, Urban Climate, and Habitat International, Accident Analysis & Prevention, Environmental Modelling & Software, Journal of Environmental Management, Finance Research Letters, among others.
+
 <details>
   <summary>Click to expand the list</summary>
 
@@ -124,5 +126,22 @@ mlp_svc = mlp_rslt.get_svc()
 - Bashar, T. J., Tao, R., Fernandes, C., & Jiao, Z. (2026). Evaluating spatial disparities in public EV charging infrastructure across the United States. Journal of Transport Geography, 130, 104507.
 - Rui, J., & Gong, W. (2026). Paying lip service? An investigation into the spatial mismatch between younger and older adults' streetscape perceptual preference and visitation behavior. Cities, 171, 106750.
 - Tang, Z., Rao, Y., & Fu, M. (2026). Synergistic Dynamics of the Thermal-Energy-Carbon Nexus in the Yangtze River Delta: Spatiotemporal Measurement, Mechanisms, and Spatial Econometric Analysis. Sustainable Cities and Society, 107125.
+- Wang, K., Xi, C., Liu, X., Zheng, L., & Zhang, Y. (2026). Understanding process differences in the impact of built–natural environments on compound heat–flood risks through urban physical characteristics. Landscape and Urban Planning, 270, 105599.
+- Xu, Y., Ma, R. L., Feng, Y. X., Zou, B., Li, S. X., Huang, W. T., ... & Peng, W. Q. (2026). A regional classification framework integrating AI and causal inference revealing the drivers of lake eutrophication in China. Water Research, 125746.
+- Putra, I. G. B., Kuo, P. F., Susanta, F. F., Tedjo, B. H., & Lord, D. (2026). GeoShapley-based interpretation of older adult pedestrian fatal vs injury crash frequency in dense urban environments. Accident Analysis & Prevention, 230, 108450.
+- Zhang, X., Hu, J., Xia, T., Mao, Y., Li, X., Hu, C., & Zhang, J. (2026). Cooling varies with green space characteristics: Unraveling nonlinear spatial heterogeneity in cooling effects of urban green spaces with geographic explainable AI. Environmental Impact Assessment Review, 119, 108401.
+- Li, F., Zhang, Q., Xie, W., Shao, Z., & Li, J. (2026). Assessing the carbon reduction potential of municipal solid waste incineration at the county level in China. Resources, Environment and Sustainability, 100310.
+- Nguyen, G. V., Van, C. P., Tran, V. N., Van, L. N., & Lee, G. (2025). Toward real-time high-resolution fluvial flood forecasting: A robust surrogate approach based on overland flow models. Environmental Modelling & Software, 106716.
+- Hao, W., Xian, Z., Wei, Z., Xu, H., & Liu, K. (2026). The impact of multi-dimensional spatial characteristics on recreational walking experiences in nature-symbiotic city. Applied Geography, 188, 103865.
+- Li, B., Zhang, Z., Wang, X., & Ren, S. (2026). Assessing stage-dependent impacts of environmental factors on public-perceived flood risk: Insights from a GeoXAI framework. Environmental Impact Assessment Review, 119, 108402.
+- Xie, Y., Liu, R., & Fan, M. (2026). Evolutionary characteristics of spatial correlation network in energy-economy-environment (3E) coupled system and their driving factors, China. Energy, 140220.
+- Pan, Q., Gao, S., Lin, S., & Liu, C. (2025). Exploring spatio-temporal heterogeneity in sustainable development drivers using explainable AI: Evidence from China. Finance Research Letters, 109018.
+- Zhao, M., Lei, S., & Li, W. (2026). Incorporating urban thermal comfort into transit-oriented development (TOD) planning: Non-linear heterogeneous built environment effects. Sustainable Cities and Society.
+- Lyu, F., Chen, K., Olhnuud, A., Sun, X., & Gong, C. (2025). Understanding the relationship between urban green infrastructure and PM2. 5 based on an explainable machine learning model: Evidence from 288 cities in China. Earth's Future, 13(11), e2025EF006861.
+- Chen, L., & Liu, Y. (2026). Disentangling the invasion landscape: Spatially-explicit explainable machine learning reveals the heterogeneous drivers of Solenopsis invicta distribution in China. Journal of Environmental Management, 397, 128366.
+- Ndagijimana, A., Nduwayezu, G., Lind, T., & Mansourian, A. (2025). Machine learning techniques to model child low height-for-age in the Northern Province of Rwanda: The role of climatological and environmental factors and their interactions. Clinical Epidemiology and Global Health, 102284.
+- Chen, L., & Liu, Y. (2026). Deconstructing driver importance: A geospatial explainable AI approach to modeling pine wilt disease susceptibility in China. Forest Ecology and Management, 603, 123471.
+- Lin, Y. F., & Lin, S. S. (2026). A spatially-coherent attribution framework for interpreting black-box tropical cyclone intensity forecasts. Stochastic Environmental Research and Risk Assessment, 40(4), 70.
+- Kang, C. D. (2025). Examining the Nonlinear and Spatial Heterogeneity of Land Price Determinants in Seoul, Republic of Korea: An Application of GeoShapley. Journal of Real Estate Analysis, 11(3), 213-243.
 
 </details>
