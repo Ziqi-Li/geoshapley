@@ -99,7 +99,7 @@ mlp_svc = mlp_rslt.get_svc()
 
 ### Some recent papers that applied GeoShapley:
 
-To date, GeoShapley has enabled more than 70 peer-reviewed empirical studies in geospatial explainable AI (XAI). These have been published in leading journals such as Journal of Transport Geography, Cities, Applied Geography, Landscape and Urban Planning, Sustainable Cities and Society, Journal of Hydrology, Water Research, Ecological Indicators, Energy, Environmental Impact Assessment Review, Urban Climate, and Habitat International, Accident Analysis & Prevention, Environmental Modelling & Software, Journal of Environmental Management, Finance Research Letters, among others.
+To date, GeoShapley has enabled more than 70 peer-reviewed empirical studies in geospatial explainable AI (XAI). These have been published in leading journals such as Journal of Transport Geography, Cities, Applied Geography, Landscape and Urban Planning, Sustainable Cities and Society, npj Urban Sustainability, Journal of Hydrology, Water Research, Ecological Indicators, Energy, Environmental Impact Assessment Review, Urban Climate, and Habitat International, Accident Analysis & Prevention, Environmental Modelling & Software, Journal of Environmental Management, Finance Research Letters, among others.
 
 <details>
   <summary>Click to expand the list</summary>
@@ -143,5 +143,18 @@ To date, GeoShapley has enabled more than 70 peer-reviewed empirical studies in 
 - Chen, L., & Liu, Y. (2026). Deconstructing driver importance: A geospatial explainable AI approach to modeling pine wilt disease susceptibility in China. Forest Ecology and Management, 603, 123471.
 - Lin, Y. F., & Lin, S. S. (2026). A spatially-coherent attribution framework for interpreting black-box tropical cyclone intensity forecasts. Stochastic Environmental Research and Risk Assessment, 40(4), 70.
 - Kang, C. D. (2025). Examining the Nonlinear and Spatial Heterogeneity of Land Price Determinants in Seoul, Republic of Korea: An Application of GeoShapley. Journal of Real Estate Analysis, 11(3), 213-243.
+- Luo, X., Tang, Z., Shen, Z., Xiao, L., Guo, H., & Li, H. (2026). Spatiotemporal Evolution, Nonlinear Driving Mechanisms, and Targeted Remediation of Cropland Fragmentation in the Sichuan Basin: A Temporally Enhanced Index and GeoXAI Approach. Land Degradation & Development.
+- Ye, F., Wang, S., & Li, X. (2026). Attributing the urban heat island effect to urban land use patterns with integrated machine learning and GeoShapley method. Sustainable Cities and Society, 145, 107457. https://doi.org/10.1016/j.scs.2026.107457
+- Yao, X., Zhang, J., Yang, J., Ye, B., & Zhu, Z. (2026). Unraveling the Impacts of Multidimensional Urban Influencing Factors on Daytime and Nighttime Thermal Environments across Urban Functional Zones using SDGSAT-1 Data and XGBoost-GeoShapley Analysis. Sustainable Cities and Society, 107508.
+- Tang, Z., Rao, Y., & Fu, M. (2026). Synergistic Dynamics of the Thermal-Energy-Carbon Nexus in the Yangtze River Delta: Spatiotemporal Measurement, Mechanisms, and Spatial Econometric Analysis. Sustainable Cities and Society, 107125.
+- Zhao, M., Lei, S., & Li, W. (2026). Incorporating urban thermal comfort into transit-oriented development (TOD) planning: Non-linear heterogeneous built environment effects. Sustainable Cities and Society.
+- Luo, X., Bi, L., Chang, X., Wang, Q., Yang, D., & Li, S. (2026). Spatial heterogeneity and land use modulation of soil moisture–vapor pressure deficit–solar-induced fluorescence interactions in Henan, China: An integrated Random Forest–GeoShapley approach. Remote Sensing, 18(2), 235.
+- Hao, W., Xian, Z., Wei, Z., Xu, H., & Liu, K. (2026). The impact of multi-dimensional spatial characteristics on recreational walking experiences in nature-symbiotic city. Applied Geography, 188, 103865.
+- Chen, L., & Liu, Y. (2026). Deconstructing driver importance: A geospatial explainable AI approach to modeling pine wilt disease susceptibility in China. Forest Ecology and Management, 603, 123471.
+- Dong, J., Yu, X., & Jia, G. (2026). Spatial heterogeneity and threshold effects of climate and human activities on ecological drought trends in northern China: Insights from a GeoShapley framework. GIScience & Remote Sensing.
+- Chen, L., & Liu, Y. (2026). Disentangling the invasion landscape: Spatially-explicit explainable machine learning reveals the heterogeneous drivers of Solenopsis invicta distribution in China. Journal of Environmental Management, 397, 128366.
+- Li, F., Zhang, Q., Xie, W., Shao, Z., & Li, J. (2026). Assessing the carbon reduction potential of municipal solid waste incineration at the county level in China. Resources, Environment and Sustainability, 100310.
+- Aghazadeh, F., Ondrejicka, V., Sharifi, A., Aghaloo, K., Firozjaei, M. K., Rahimi, A., ... & Zhou, Y. (2026). Assessing urban thermal comfort: a multi-model analysis of European cities over two decades. npj Urban Sustainability.
+
 
 </details>
