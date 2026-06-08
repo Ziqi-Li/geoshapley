@@ -90,17 +90,14 @@ the same way.
 from geoshapley import GeoShapleyTreeExplainer
 from xgboost import XGBRegressor
 
-X_train, X_test, y_train, y_test = train_test_split(X_geo, y, random_state=1)
+X_train, X_test, y_train, y_test = train_test_split(X_geo, y)
 
-model = XGBRegressor(objective="reg:squarederror").fit(X_train.values, y_train)
+model = XGBRegressor().fit(X_train.values, y_train)
 
-# Spatial columns must still be the last columns in X_geo.
 tree_explainer = GeoShapleyTreeExplainer(model, g=2)
 tree_rslt = tree_explainer.explain(X_geo)
 
 tree_rslt.summary_plot()
-tree_rslt.partial_dependence_plots()
-tree_svc = tree_rslt.get_svc(col=[0], coef_type="gwr", include_primary=True)
 ```
 
 `GeoShapleyTreeExplainer` currently supports scikit-learn regression trees,
