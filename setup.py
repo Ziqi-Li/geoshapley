@@ -21,7 +21,7 @@ dependency_links = [x.strip().replace('git+', '') for x in all_reqs \
 
 setup(
     name="geoshapley",
-    version='0.1.0.0',
+    version='0.2.0.0',
     description="GeoShapley value for measuring spatial effects",
     long_description=README,
     long_description_content_type="text/markdown",
