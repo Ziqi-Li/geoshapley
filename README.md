@@ -11,7 +11,7 @@
 A game theory approach to measuring spatial effects from machine learning models. GeoShapley is built on Shapley value and Kernel SHAP estimator.
 
 ### Recent Updates
-- 06/2026 v0.2.0 - GeoShapleyTreeExplainer for tree-based models that extends TreeSHAP. This would be highly efficient and preferred for tree-based models.
+- 06/2026 v0.2.0 - GeoShapleyTreeExplainer for tree-based models that extends TreeSHAP. This would be highly efficient and preferred for tree-based models. See the example in the notebooks folder: [Seattle house price example AutoML + GeoShapleyTreeExplainer.ipynb](https://github.com/Ziqi-Li/geoshapley/blob/main/notebooks/Seattle%20house%20price%20example%20AutoML%20%2B%20GeoShapleyTreeExplainer.ipynb)
 - 05/2025 v0.1.0 - Several magnitude of speed-up for more than 10 features by implementing paired sampling from Covert and Lee (2021)
 
 ### Installation:
@@ -36,7 +36,8 @@ GeoShapley can explain any model that takes tabular data + spatial features (e.g
 3. MLP or other `scikit-learn` modules.
 4. Tabular Deep Learning models such as [TabNet](https://github.com/dreamquark-ai/tabnet)
 6. [Explainable Boosting Machine](https://github.com/interpretml/interpret)
-7. Statistical models: OLS/Gaussian Process/GWR
+7. Tabular Foundation Models such as TabPFN.
+8. Statistical models: OLS/Gaussian Process/GWR.
 
 Other models can be supported by defining a helper function model.predict() to wrap around their original models' prediction or inference functions.
 
