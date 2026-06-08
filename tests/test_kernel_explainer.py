@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from geoshapley import GeoShapleyExplainer
 
@@ -70,3 +71,41 @@ def test_kernel_explainer_is_additive_for_nonlinear_model():
     assert result.primary.shape == (len(X), 2)
     assert result.geo.shape == (len(X),)
     assert result.geo_intera.shape == (len(X), 2)
+
+
+def test_g1_matches_kernel_shap_after_redistribution():
+    shap = pytest.importorskip("shap")
+    X = pd.DataFrame({
+        "x1": [-1.0, 0.0, 1.0, 2.0],
+        "x2": [2.0, 0.0, -2.0, 1.0],
+        "geo": [0.0, 1.0, 2.0, 3.0],
+    })
+
+    def predict(values):
+        values = np.asarray(values)
+        return (
+            1.0
+            + 2.0 * values[:, 0]
+            - 3.0 * values[:, 1]
+            + 5.0 * values[:, 2]
+            + 1.25 * values[:, 0] * values[:, 2]
+            - 0.5 * values[:, 1] * values[:, 2]
+        )
+
+    result = GeoShapleyExplainer(
+        predict,
+        background=X.values,
+        g=1,
+        exact=True,
+    ).explain(X, n_jobs=1)
+    kernel_explainer = shap.KernelExplainer(predict, X.values)
+    shap_values = kernel_explainer.shap_values(X.values, nsamples=2 ** X.shape[1])
+    redistributed = result.geoshap_to_shap()
+
+    np.testing.assert_allclose(result.base_value, kernel_explainer.expected_value)
+    np.testing.assert_allclose(redistributed, shap_values, atol=1e-6)
+    np.testing.assert_allclose(
+        result.base_value + redistributed.sum(axis=1),
+        predict(X.values),
+        atol=1e-6,
+    )

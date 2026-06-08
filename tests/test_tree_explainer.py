@@ -86,10 +86,18 @@ def test_g1_matches_tree_shap_after_redistribution():
     ).fit(X.values, y)
 
     result = GeoShapleyTreeExplainer(model, g=1).explain(X)
-    shap_values = shap.TreeExplainer(model).shap_values(X)
+    tree_explainer = shap.TreeExplainer(model)
+    shap_values = tree_explainer.shap_values(X)
     redistributed = result.geoshap_to_shap()
+    expected_value = np.ravel(tree_explainer.expected_value)[0]
 
+    np.testing.assert_allclose(result.base_value, expected_value)
     np.testing.assert_allclose(redistributed, shap_values, atol=1e-7)
+    np.testing.assert_allclose(
+        result.base_value + redistributed.sum(axis=1),
+        model.predict(X.values),
+        atol=1e-7,
+    )
 
 
 def test_xgboost_additivity_if_available():
