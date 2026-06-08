@@ -76,6 +76,41 @@ mlp_rslt.contribution_bar_plot()
 mlp_svc = mlp_rslt.get_svc()
 ```
 
+### Fast tree-path GeoShapley for tree models:
+
+For supported tree regressors, `GeoShapleyTreeExplainer` computes an exact
+tree-path-dependent GeoShapley decomposition without a background dataset. It
+returns the same `GeoShapleyResults` object as `GeoShapleyExplainer`, so summary
+plots, partial dependence plots, contribution bars, and `get_svc()` can be used
+the same way.
+
+```python
+from geoshapley import GeoShapleyTreeExplainer
+from xgboost import XGBRegressor
+
+X_train, X_test, y_train, y_test = train_test_split(X_geo, y, random_state=1)
+
+model = XGBRegressor(objective="reg:squarederror").fit(X_train.values, y_train)
+
+# Spatial columns must still be the last columns in X_geo.
+tree_explainer = GeoShapleyTreeExplainer(model, g=2)
+tree_rslt = tree_explainer.explain(X_geo)
+
+tree_rslt.summary_plot()
+tree_rslt.partial_dependence_plots()
+tree_svc = tree_rslt.get_svc(col=[0], coef_type="gwr", include_primary=True)
+```
+
+`GeoShapleyTreeExplainer` currently supports scikit-learn regression trees,
+forest-style regressors, `GradientBoostingRegressor`, XGBoost sklearn models,
+native `xgboost.Booster` objects, LightGBM sklearn models, native
+`lightgbm.Booster` objects, and FLAML `AutoML` objects whose selected estimator
+is a supported tree model. It uses tree path cover proportions to integrate out
+missing players, analogous to TreeSHAP's tree-path-dependent setting. This is a
+different value function from Kernel GeoShapley with a user-supplied background
+dataset, though the two are often close when the background represents the tree
+model's training distribution.
+
 ### Visuals:
 
 #### Shap-style summary plot
