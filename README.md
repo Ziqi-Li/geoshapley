@@ -11,6 +11,7 @@
 A game theory approach to measuring spatial effects from machine learning models. GeoShapley is built on Shapley value and Kernel SHAP estimator.
 
 ### Recent Updates
+- 06/2026 v0.2.0 - GeoShapleyTreeExplainer for tree-based models that extends TreeSHAP. This would be highly efficient and preferred for tree-based models.
 - 05/2025 v0.1.0 - Several magnitude of speed-up for more than 10 features by implementing paired sampling from Covert and Lee (2021)
 
 ### Installation:
