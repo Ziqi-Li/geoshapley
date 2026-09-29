@@ -6,12 +6,10 @@ the training/path cover proportions stored in each tree, in the same spirit as
 TreeSHAP's ``tree_path_dependent`` setting.
 """
 
-import itertools
 import json
 from types import SimpleNamespace
 
 import numpy as np
-import scipy.special
 
 from .geoshapley import GeoShapleyResults
 
@@ -43,6 +41,11 @@ class GeoShapleyTreeExplainer:
 
     Notes
     -----
+    The exact tree-path calculation does not enumerate feature coalitions. It
+    accumulates closed-form contributions along leaf paths using elementary
+    symmetric polynomials, with time quadratic in path depth rather than
+    exponential in the total number of features.
+
     This explainer uses a different value function from
     :class:`GeoShapleyExplainer`. The Kernel explainer uses a user-supplied
     background dataset; this tree explainer uses tree path cover proportions.
@@ -88,7 +91,7 @@ class GeoShapleyTreeExplainer:
         feature_names = list(X_geo.columns) if hasattr(X_geo, "columns") else None
         self._adapter = _make_tree_adapter(self.model, feature_names=feature_names)
         self.predict_f = self._adapter.predict
-        self._precompute_design()
+        self.base_value = self._adapter.empty_value()
 
         values = np.vstack([self._explain_row(row) for row in X_values])
         primary = values[:, :self.k]
@@ -96,35 +99,8 @@ class GeoShapleyTreeExplainer:
         geo_intera = values[:, (self.k + 1):]
         return GeoShapleyResults(self, self.base_value, primary, geo, geo_intera)
 
-    def _precompute_design(self):
-        player_count = self.k + 1
-        output_count = 2 * self.k + 1
-        coalitions = [tuple(s) for s in _powerset(range(player_count))]
-        self.coalitions = coalitions
-        self.coalition_masks = np.array([
-            sum(1 << player for player in coalition)
-            for coalition in coalitions
-        ], dtype=np.int64)
-
-        Z = np.zeros((len(coalitions), output_count))
-        kernels = np.zeros(len(coalitions))
-
-        for i, coalition in enumerate(coalitions):
-            if coalition:
-                Z[i, coalition] = 1
-            if self.k in coalition and len(coalition) > 1:
-                for player in coalition:
-                    if player < self.k:
-                        Z[i, self.k + 1 + player] = 1
-            kernels[i] = _shapley_kernel(player_count, len(coalition))
-
-        ztw = Z.T * kernels
-        self._projection = np.linalg.solve(ztw @ Z, ztw)
-        self.base_value = self._adapter.empty_value()
-
     def _explain_row(self, row):
-        coalition_values = self._adapter.coalition_values(row, self.k, self.coalition_masks)
-        return self._projection @ (coalition_values - self.base_value)
+        return self._adapter.geoshap_values(row, self.k)
 
 
 class _PathEnsembleAdapter:
@@ -153,14 +129,13 @@ class _PathEnsembleAdapter:
             for tree in self.trees
         )
 
-    def coalition_values(self, row, k, coalition_masks):
-        values = np.full(len(coalition_masks), self.base_value)
+    def geoshap_values(self, row, k):
+        values = np.zeros(2 * k + 1)
         for tree in self.trees:
-            values += tree["weight"] * _tree_coalition_values(
+            values += tree["weight"] * _tree_geoshap_values(
                 tree["paths"],
                 row,
                 k,
-                coalition_masks,
             )
         return values
 
@@ -392,33 +367,92 @@ def _tree_full_value(paths, row):
     return total
 
 
-def _tree_coalition_values(paths, row, k, coalition_masks):
-    values = np.zeros(len(coalition_masks))
+def _tree_geoshap_values(paths, row, k):
+    """Accumulate exact GeoShapley terms without enumerating coalitions.
+
+    A leaf path contributes a product game over the distinct players on that
+    path. Expanding that product into unanimity games gives closed-form
+    GeoShapley coefficients. Elementary symmetric polynomials collect all
+    interaction orders in quadratic time in the number of path players.
+
+    For a unanimity term of order q without GEO, each member receives
+    2/[q(q+1)] as primary and 2(q-1)/[q(q+1)] as GEO interaction, while GEO
+    receives -(q-1)/(q+1). For a term containing GEO and q other players,
+    each member receives 2/(q+1) as interaction and GEO receives
+    (1-q)/(q+1). These coefficients preserve the original weighted projection
+    and redistribute to ordinary Shapley values through ``geoshap_to_shap``.
+    """
+    primary = np.zeros(k)
+    geo = 0.0
+    geo_intera = np.zeros(k)
 
     for path in paths:
-        bad_mask = 0
         player_factors = {}
         base_weight = 1.0
 
         for split in path["splits"]:
             player = split.feature if split.feature < k else k
-            if not split.matches(row):
-                bad_mask |= 1 << player
-            else:
+            base_weight *= split.probability
+            if player_factors.get(player, 1.0) == 0.0:
+                continue
+            if split.matches(row):
                 player_factors[player] = (
                     player_factors.get(player, 1.0) / split.probability
                 )
-            base_weight *= split.probability
+            else:
+                player_factors[player] = 0.0
 
-        path_weights = np.full(len(coalition_masks), base_weight)
-        path_weights[(coalition_masks & bad_mask) != 0] = 0.0
+        scale = path["value"] * base_weight
+        feature_ids = np.array(
+            [player for player in player_factors if player < k],
+            dtype=int,
+        )
+        deltas = np.array(
+            [player_factors[player] - 1.0 for player in feature_ids],
+            dtype=float,
+        )
+        geo_delta = player_factors.get(k, 1.0) - 1.0
 
-        for player, factor in player_factors.items():
-            path_weights[(coalition_masks & (1 << player)) != 0] *= factor
+        # e[q] is the q-th elementary symmetric polynomial of deltas.
+        e = np.zeros(len(deltas) + 1)
+        e[0] = 1.0
+        degree = 0
+        for delta in deltas:
+            degree += 1
+            for q in range(degree, 0, -1):
+                e[q] += delta * e[q - 1]
 
-        values += path["value"] * path_weights
+        for q in range(1, len(e)):
+            geo -= scale * ((q - 1.0) / (q + 1.0)) * e[q]
+        for q in range(len(e)):
+            geo += scale * geo_delta * ((1.0 - q) / (q + 1.0)) * e[q]
 
-    return values
+        for position, feature in enumerate(feature_ids):
+            delta = deltas[position]
+            if delta == 0.0:
+                continue
+
+            # Divide prod_j (1 + delta_j t) by (1 + delta t).
+            excluded = np.zeros(len(deltas))
+            excluded[0] = 1.0
+            for q in range(1, len(excluded)):
+                excluded[q] = e[q] - delta * excluded[q - 1]
+
+            for q in range(1, len(e)):
+                included = delta * excluded[q - 1]
+                primary[feature] += (
+                    scale * (2.0 / (q * (q + 1.0))) * included
+                )
+                geo_intera[feature] += (
+                    scale
+                    * (2.0 * (q - 1.0) / (q * (q + 1.0)))
+                    * included
+                )
+                geo_intera[feature] += (
+                    scale * geo_delta * (2.0 / (q + 1.0)) * included
+                )
+
+    return np.concatenate((primary, [geo], geo_intera))
 
 
 class _Split(SimpleNamespace):
@@ -477,24 +511,3 @@ def _xgboost_base_score(booster):
     if isinstance(raw, str):
         raw = raw.strip("[]")
     return float(raw)
-
-
-def _powerset(iterable):
-    items = list(iterable)
-    return itertools.chain.from_iterable(
-        itertools.combinations(items, r)
-        for r in range(len(items) + 1)
-    )
-
-
-def _shapley_kernel(n_players, coalition_size):
-    if coalition_size == 0 or coalition_size == n_players:
-        return 100000000
-    return (
-        (n_players - 1)
-        / (
-            scipy.special.binom(n_players, coalition_size)
-            * coalition_size
-            * (n_players - coalition_size)
-        )
-    )
