@@ -111,7 +111,11 @@ is a supported tree model. It uses tree path cover proportions to integrate out
 missing players, analogous to TreeSHAP's tree-path-dependent setting. This is a
 different value function from Kernel GeoShapley with a user-supplied background
 dataset, though the two are often close when the background represents the tree
-model's training distribution.
+model's training distribution. The implementation accumulates exact
+GeoShapley terms along tree paths in quadratic time in path depth and does not
+enumerate the `2^(k+1)` coalitions of the `k` non-spatial features plus the GEO
+player. Models with many input features therefore remain practical when their
+trees are reasonably shallow.
 
 ### Visuals:
 

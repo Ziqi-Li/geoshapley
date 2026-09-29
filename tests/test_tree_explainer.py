@@ -1,3 +1,6 @@
+import itertools
+import math
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -33,6 +36,66 @@ def _assert_additive(model, X, result, atol=1e-8):
         + result.geo_intera.sum(axis=1)
     )
     np.testing.assert_allclose(total, model.predict(X.values), atol=atol)
+
+
+def _exhaustive_projection(explainer, row):
+    """Reference implementation of the original exponential algorithm."""
+    k = explainer.k
+    player_count = k + 1
+    coalitions = list(itertools.chain.from_iterable(
+        itertools.combinations(range(player_count), size)
+        for size in range(player_count + 1)
+    ))
+    masks = np.array([
+        sum(1 << player for player in coalition)
+        for coalition in coalitions
+    ])
+    design = np.zeros((len(coalitions), 2 * k + 1))
+    weights = np.zeros(len(coalitions))
+
+    for i, coalition in enumerate(coalitions):
+        if coalition:
+            design[i, list(coalition)] = 1.0
+        if k in coalition:
+            for player in coalition:
+                if player < k:
+                    design[i, k + 1 + player] = 1.0
+        size = len(coalition)
+        weights[i] = (
+            1e8
+            if size in (0, player_count)
+            else (player_count - 1)
+            / (math.comb(player_count, size) * size * (player_count - size))
+        )
+
+    coalition_values = np.full(len(coalitions), explainer._adapter.base_value)
+    for tree in explainer._adapter.trees:
+        tree_values = np.zeros(len(coalitions))
+        for path in tree["paths"]:
+            base_weight = 1.0
+            bad_mask = 0
+            factors = {}
+            for split in path["splits"]:
+                player = split.feature if split.feature < k else k
+                base_weight *= split.probability
+                if split.matches(row):
+                    factors[player] = factors.get(player, 1.0) / split.probability
+                else:
+                    bad_mask |= 1 << player
+
+            path_weights = np.full(len(coalitions), base_weight)
+            path_weights[(masks & bad_mask) != 0] = 0.0
+            for player, factor in factors.items():
+                path_weights[(masks & (1 << player)) != 0] *= factor
+            tree_values += path["value"] * path_weights
+        coalition_values += tree["weight"] * tree_values
+
+    weighted_design = design.T * weights
+    projection = np.linalg.solve(
+        weighted_design @ design,
+        weighted_design,
+    )
+    return projection @ (coalition_values - explainer.base_value)
 
 
 def test_decision_tree_additivity():
@@ -73,6 +136,42 @@ def test_gradient_boosting_additivity():
     result = GeoShapleyTreeExplainer(model, g=2).explain(X)
 
     _assert_additive(model, X, result)
+
+
+def test_polynomial_algorithm_matches_exhaustive_projection():
+    X, y = _toy_data(n=50, seed=4, g=2)
+    model = RandomForestRegressor(
+        n_estimators=3,
+        max_depth=4,
+        random_state=3,
+        n_jobs=1,
+    ).fit(X.values, y)
+    explained = X.iloc[:4]
+
+    explainer = GeoShapleyTreeExplainer(model, g=2)
+    result = explainer.explain(explained)
+    actual = np.column_stack((result.primary, result.geo, result.geo_intera))
+    expected = np.vstack([
+        _exhaustive_projection(explainer, row)
+        for row in explained.values
+    ])
+
+    np.testing.assert_allclose(actual, expected, atol=5e-7)
+
+
+def test_many_features_do_not_require_coalition_enumeration():
+    rng = np.random.default_rng(8)
+    X_values = rng.normal(size=(100, 82))
+    y = X_values[:, 0] * X_values[:, 80] + X_values[:, 1] - X_values[:, 81]
+    columns = [f"x{i}" for i in range(80)] + ["lat", "lon"]
+    X = pd.DataFrame(X_values, columns=columns)
+    model = DecisionTreeRegressor(max_depth=4, random_state=2).fit(X.values, y)
+
+    result = GeoShapleyTreeExplainer(model, g=2).explain(X.iloc[:3])
+
+    assert result.primary.shape == (3, 80)
+    assert result.geo_intera.shape == (3, 80)
+    _assert_additive(model, X.iloc[:3], result)
 
 
 def test_g1_matches_tree_shap_after_redistribution():
