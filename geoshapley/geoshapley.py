@@ -7,7 +7,6 @@ from tqdm.auto import tqdm
 import itertools
 import matplotlib.pyplot as plt
 from math import factorial,ceil
-import warnings
 
 class GeoShapleyExplainer:
     def __init__(self, predict_f, background=None, g=2, exact=False, n_sampled_coalitions=None):
