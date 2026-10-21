@@ -125,7 +125,7 @@ class GeoShapleyExplainer:
             sampled_additional = np.random.choice(
                 sampling_pool, 
                 size=min(remaining_slots//2, len(sampling_pool)),
-                replace=False,
+                replace=True,
                 p=weights
             )
 
@@ -141,6 +141,11 @@ class GeoShapleyExplainer:
         
         # Precompute Z matrix with sampled coalitions
         self._precompute_Z_matrix()
+        
+        if remaining_slots > 0 and len(sampled_additional):
+            self.sampled_kernels[
+                ~np.isin(self.sampled_indices, must_have_indices)
+            ] = self.shapley_kernels[sampling_pool].sum() / len(sampled_additional)
             
     def _precompute_Z_matrix(self):
         """
@@ -170,29 +175,6 @@ class GeoShapleyExplainer:
 
         # Get sampled shapley kernels
         self.sampled_kernels = np.array([self.shapley_kernels[i] for i in self.sampled_indices])
-
-        # Smmary by set size: number collected so far and total number in the complete set
-        players = k + 1
-        sampled_sizes = self.coalition_sizes[self.sampled_indices]
-        sampled_counts = np.bincount(sampled_sizes, minlength=players + 1)
-        full_counts = np.bincount(self.coalition_sizes, minlength=players + 1)
-
-        # If a specific internal size layer is not sampled, issue a warning and retain the original kernel weights
-        missing_sizes = np.flatnonzero(sampled_counts[1:players] == 0) + 1
-        if missing_sizes.size:
-            warnings.warn(
-                f"Missing coalition sizes: {missing_sizes.tolist()}. "
-                "Falling back to original kernel weights for this explanation. "
-                "Increase n_sampled_coalitions to enable stratified weighting.",
-                UserWarning,
-                stacklevel=2,
-            )
-            return
-
-        # Re-weighting: restore the total weight of each size stratum to match that of the full enumeration
-        self.sampled_kernels *= (
-            full_counts[sampled_sizes] / sampled_counts[sampled_sizes]
-        )
 
     def _vectorized_kernel_geoshap_single(self, x, reference):
         """
