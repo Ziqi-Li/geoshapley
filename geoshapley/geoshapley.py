@@ -124,7 +124,7 @@ class GeoShapleyExplainer:
             sampled_additional = np.random.choice(
                 sampling_pool, 
                 size=min(remaining_slots//2, len(sampling_pool)),
-                replace=False,
+                replace=True,
                 p=weights
             )
 
@@ -140,6 +140,11 @@ class GeoShapleyExplainer:
         
         # Precompute Z matrix with sampled coalitions
         self._precompute_Z_matrix()
+        
+        if remaining_slots > 0 and len(sampled_additional):
+            self.sampled_kernels[
+                ~np.isin(self.sampled_indices, must_have_indices)
+            ] = self.shapley_kernels[sampling_pool].sum() / len(sampled_additional)
             
     def _precompute_Z_matrix(self):
         """
